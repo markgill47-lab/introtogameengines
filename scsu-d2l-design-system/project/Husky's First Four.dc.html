@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Archivo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+</style>
+</helmet>
+
+<div style="width:100%; background:#F1EBE1; padding:40px 0 60px; font-family:'Public Sans',sans-serif;">
+  <div style="max-width:1040px; margin:0 auto; padding:0 32px;">
+
+    <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+      <div style="font-family:'SFMono-Regular',ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#8a847c; margin-bottom:10px;">Welcome-week board · paste-ready for D2L · 1040px</div>
+    </sc-if>
+
+    <!-- ===== BANNER ===== -->
+    <div style="position:relative; overflow:hidden; background:#161616; border-radius:16px 16px 0 0; padding:40px 44px 38px;">
+      <div style="position:absolute; inset:0; left:62%; background:#B11226; clip-path:polygon(24% 0, 100% 0, 100% 100%, 0% 100%);"></div>
+      <div style="position:absolute; inset:0; left:62%; background:#7E0C1A; clip-path:polygon(50% 0, 64% 0, 24% 100%, 10% 100%); opacity:.6;"></div>
+      <span style="position:absolute; top:38px; right:8%; width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-bottom:29px solid #FAF7F2; opacity:.92; z-index:3;"></span>
+      <div style="position:relative; z-index:3; max-width:620px;">
+        <div style="font-family:'Archivo'; font-weight:800; font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:#E8A9B2;">St. Cloud State University · Welcome Week</div>
+        <h1 style="font-family:'Archivo',sans-serif; font-weight:900; font-size:58px; line-height:.92; color:#FAF7F2; margin:16px 0 0; text-transform:uppercase; letter-spacing:-.02em;">Husky's<br>First Four</h1>
+        <div style="display:flex; align-items:center; gap:14px; margin-top:20px;">
+          <span style="font-family:'Archivo'; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; color:#FAF7F2; background:#B11226; padding:8px 16px; border-radius:4px;">Aug 20–23, 2026</span>
+          <span style="font-size:15px; color:#D9D4CC;">Move-in to first day — four days to find your people.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 4 DAY CARDS ===== -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:14px;">
+
+      <!-- DAY 1 -->
+      <div style="position:relative; overflow:hidden; border-radius:14px; min-height:540px; background:#1b1b1b; display:flex;">
+        <sc-if value="{{ usePhotos }}" hint-placeholder-val="{{ true }}"><div style="position:absolute; inset:0; background-image:linear-gradient(180deg, rgba(177,18,38,.34) 0%, rgba(22,22,22,.52) 40%, rgba(18,18,18,.95) 100%), url('https://images.unsplash.com/photo-1758523670969-dd1b1254062d?w=1100&q=70&auto=format&fit=crop'); background-size:cover; background-position:center;"></div></sc-if>
+        <div style="position:absolute; top:8px; right:14px; font-family:'Archivo'; font-weight:900; font-size:120px; line-height:1; color:rgba(255,255,255,.10); z-index:1;">1</div>
+        <div style="position:relative; z-index:2; padding:22px 20px; display:flex; flex-direction:column; justify-content:space-between; width:100%;">
+          <div>
+            <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#F0B8C0;">Day 01 · Thu Aug 20</div>
+            <h2 style="font-family:'Archivo',sans-serif; font-weight:900; font-size:25px; line-height:.96; color:#FAF7F2; margin:10px 0 0; text-transform:uppercase; letter-spacing:-.01em;">Move-In<br>Day</h2>
+            <div style="width:42px; height:3px; background:#B11226; margin-top:12px;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:18px;">
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">9:00a</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Residence halls open — roll in &amp; unpack</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">12:30p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Husky Welcome Lunch on the Mall</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">3:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Meet your floor &amp; your RA</span></div>
+            <div style="background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.2); border-radius:11px; padding:11px 12px; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;"><span style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid #FFD27A;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#FFD27A;">Tonight</span></div>
+              <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:700; color:#fff; flex:none; width:44px;">7:30p</span><span style="font-size:12.5px; line-height:1.3; color:#fff; font-weight:600;">Glow Night — music &amp; lawn games</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 2 -->
+      <div style="position:relative; overflow:hidden; border-radius:14px; min-height:540px; background:#7E0C1A; display:flex;">
+        <sc-if value="{{ usePhotos }}" hint-placeholder-val="{{ true }}"><div style="position:absolute; inset:0; background-image:linear-gradient(180deg, rgba(126,12,26,.42) 0%, rgba(60,8,14,.62) 42%, rgba(18,18,18,.95) 100%), url('https://images.unsplash.com/photo-1758270704763-22072a90d3b6?w=1100&q=70&auto=format&fit=crop'); background-size:cover; background-position:center;"></div></sc-if>
+        <div style="position:absolute; top:8px; right:14px; font-family:'Archivo'; font-weight:900; font-size:120px; line-height:1; color:rgba(255,255,255,.10); z-index:1;">2</div>
+        <div style="position:relative; z-index:2; padding:22px 20px; display:flex; flex-direction:column; justify-content:space-between; width:100%;">
+          <div>
+            <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#F0B8C0;">Day 02 · Fri Aug 21</div>
+            <h2 style="font-family:'Archivo',sans-serif; font-weight:900; font-size:25px; line-height:.96; color:#FAF7F2; margin:10px 0 0; text-transform:uppercase; letter-spacing:-.01em;">Get<br>Oriented</h2>
+            <div style="width:42px; height:3px; background:#FAF7F2; margin-top:12px;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:18px;">
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">10:00a</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">New Husky Welcome &amp; President's address</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">12:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Lunch with your orientation group</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">2:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Campus tour + tech setup (D2L, email, ID)</span></div>
+            <div style="background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.2); border-radius:11px; padding:11px 12px; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;"><span style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid #FFD27A;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#FFD27A;">Tonight</span></div>
+              <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:700; color:#fff; flex:none; width:44px;">8:00p</span><span style="font-size:12.5px; line-height:1.3; color:#fff; font-weight:600;">Outdoor Movie at Atwood Mall</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 3 -->
+      <div style="position:relative; overflow:hidden; border-radius:14px; min-height:540px; background:#1b1b1b; display:flex;">
+        <sc-if value="{{ usePhotos }}" hint-placeholder-val="{{ true }}"><div style="position:absolute; inset:0; background-image:linear-gradient(180deg, rgba(22,22,22,.40) 0%, rgba(22,22,22,.58) 40%, rgba(18,18,18,.95) 100%), url('https://images.unsplash.com/photo-1758523670969-dd1b1254062d?w=1100&q=70&auto=format&fit=crop'); background-size:cover; background-position:left 30%;"></div></sc-if>
+        <div style="position:absolute; top:8px; right:14px; font-family:'Archivo'; font-weight:900; font-size:120px; line-height:1; color:rgba(255,255,255,.10); z-index:1;">3</div>
+        <div style="position:relative; z-index:2; padding:22px 20px; display:flex; flex-direction:column; justify-content:space-between; width:100%;">
+          <div>
+            <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#F0B8C0;">Day 03 · Sat Aug 22</div>
+            <h2 style="font-family:'Archivo',sans-serif; font-weight:900; font-size:25px; line-height:.96; color:#FAF7F2; margin:10px 0 0; text-transform:uppercase; letter-spacing:-.01em;">Discover<br>St. Cloud</h2>
+            <div style="width:42px; height:3px; background:#B11226; margin-top:12px;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:18px;">
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">10:00a</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Org Fair — 200+ clubs on the green</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">1:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Pick-your-adventure: rec, arts &amp; service</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">4:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Riverfront walk + downtown St. Cloud</span></div>
+            <div style="background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.2); border-radius:11px; padding:11px 12px; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;"><span style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid #FFD27A;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#FFD27A;">Tonight</span></div>
+              <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:700; color:#fff; flex:none; width:44px;">9:00p</span><span style="font-size:12.5px; line-height:1.3; color:#fff; font-weight:600;">Bonfire &amp; s'mores by the Mississippi</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 4 -->
+      <div style="position:relative; overflow:hidden; border-radius:14px; min-height:540px; background:#8a0e1f; display:flex;">
+        <sc-if value="{{ usePhotos }}" hint-placeholder-val="{{ true }}"><div style="position:absolute; inset:0; background-image:linear-gradient(180deg, rgba(177,18,38,.40) 0%, rgba(120,12,24,.60) 42%, rgba(18,18,18,.95) 100%), url('https://images.unsplash.com/photo-1758270704763-22072a90d3b6?w=1100&q=70&auto=format&fit=crop'); background-size:cover; background-position:right 40%;"></div></sc-if>
+        <div style="position:absolute; top:8px; right:14px; font-family:'Archivo'; font-weight:900; font-size:120px; line-height:1; color:rgba(255,255,255,.10); z-index:1;">4</div>
+        <div style="position:relative; z-index:2; padding:22px 20px; display:flex; flex-direction:column; justify-content:space-between; width:100%;">
+          <div>
+            <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#F0B8C0;">Day 04 · Sun Aug 23</div>
+            <h2 style="font-family:'Archivo',sans-serif; font-weight:900; font-size:25px; line-height:.96; color:#FAF7F2; margin:10px 0 0; text-transform:uppercase; letter-spacing:-.01em;">Get Set<br>for Class</h2>
+            <div style="width:42px; height:3px; background:#FAF7F2; margin-top:12px;"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:18px;">
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">11:00a</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Find-your-classes walkthrough</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">1:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Advising &amp; academic success drop-in</span></div>
+            <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:600; color:#F0B8C0; flex:none; width:44px;">3:00p</span><span style="font-size:12.5px; line-height:1.3; color:#EDE7E0;">Library &amp; study-skills crash course</span></div>
+            <div style="background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.2); border-radius:11px; padding:11px 12px; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;"><span style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid #FFD27A;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#FFD27A;">Tonight</span></div>
+              <div style="display:flex; gap:9px;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; font-weight:700; color:#fff; flex:none; width:44px;">6:00p</span><span style="font-size:12.5px; line-height:1.3; color:#fff; font-weight:600;">Husky Kickoff Concert + dinner</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div style="background:#161616; border-radius:0 0 16px 16px; padding:20px 28px; margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:13px solid #B11226;"></span>
+        <span style="font-family:'Archivo'; font-weight:800; font-size:15px; letter-spacing:.02em; text-transform:uppercase; color:#FAF7F2;">Classes begin Monday, August 24</span>
+      </div>
+      <span style="font-size:13px; color:#9a948c;">Questions? Stop by the Welcome Center any time during First Four.</span>
+    </div>
+
+    <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+      <div style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:10.5px; color:#a59f96; margin-top:12px; line-height:1.6;">Photos: Vitaly Gariev / Unsplash (free license). Swap in your own campus shots, or flip the Photos tweak off to use solid Husky-red blocks if D2L strips external images.</div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;usePhotos&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Display&quot; },
+  &quot;showNotes&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Display&quot; }
+}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      usePhotos: this.props.usePhotos ?? true,
+      showNotes: this.props.showNotes ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>

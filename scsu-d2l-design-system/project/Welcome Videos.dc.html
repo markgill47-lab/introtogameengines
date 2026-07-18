@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Archivo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+</style>
+</helmet>
+
+<div style="width:100%; background:#F1EBE1; padding:40px 0 56px; font-family:'Public Sans',sans-serif;">
+  <div style="max-width:1080px; margin:0 auto; padding:0 32px;">
+
+    <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+      <div style="font-family:'SFMono-Regular',ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#8a847c; margin-bottom:10px;">Welcome videos · paste-ready for D2L · 1080px</div>
+    </sc-if>
+
+    <!-- header -->
+    <div style="display:flex; align-items:center; gap:13px; margin-bottom:22px;">
+      <span style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #B11226;"></span>
+      <div>
+        <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#B11226;">St. Cloud State · New Husky Welcome</div>
+        <h1 style="font-family:'Archivo',sans-serif; font-weight:900; font-size:38px; line-height:1; color:#161616; margin:6px 0 0; text-transform:uppercase; letter-spacing:-.015em;">Welcome Videos</h1>
+      </div>
+    </div>
+
+    <!-- layout: list (left) + player (right 2/3) -->
+    <div style="display:grid; grid-template-columns:minmax(0,330px) minmax(0,1fr); gap:18px; align-items:start;">
+
+      <!-- ===== LEFT: speaker list ===== -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+
+        <!-- President -->
+        <button onClick="{{ select0 }}" style="position:relative; width:100%; text-align:left; border:1px solid #EADFD0; background:#fff; border-radius:14px; padding:15px 16px; cursor:pointer; font-family:'Public Sans',sans-serif; display:flex; gap:13px; align-items:center;">
+          <sc-if value="{{ isActive0 }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute; inset:0; border:2px solid #B11226; border-radius:14px; pointer-events:none;"></div>
+            <div style="position:absolute; left:0; top:14px; bottom:14px; width:5px; background:#B11226; border-radius:0 4px 4px 0;"></div>
+          </sc-if>
+          <div style="position:relative; flex:none; width:52px; height:52px; border-radius:50%; background:repeating-linear-gradient(45deg,#F4EFE7,#F4EFE7 6px,#EADFD0 6px,#EADFD0 12px); border:2px solid #EADFD0; display:flex; align-items:center; justify-content:center;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:8px; color:#a59f96;">PHOTO</span></div>
+          <div style="position:relative; flex:1; min-width:0;">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#B11226;">President</div>
+            <div style="font-family:'Epilogue'; font-weight:700; font-size:16px; color:#161616; line-height:1.2; margin-top:2px;">Dr. Jordan Avery</div>
+            <sc-if value="{{ showDurations }}" hint-placeholder-val="{{ true }}"><div style="display:flex; align-items:center; gap:6px; margin-top:5px;"><span style="width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid #8a847c;"></span><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; color:#8a847c;">4:12</span></div></sc-if>
+          </div>
+        </button>
+
+        <!-- Provost -->
+        <button onClick="{{ select1 }}" style="position:relative; width:100%; text-align:left; border:1px solid #EADFD0; background:#fff; border-radius:14px; padding:15px 16px; cursor:pointer; font-family:'Public Sans',sans-serif; display:flex; gap:13px; align-items:center;">
+          <sc-if value="{{ isActive1 }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; border:2px solid #B11226; border-radius:14px; pointer-events:none;"></div>
+            <div style="position:absolute; left:0; top:14px; bottom:14px; width:5px; background:#B11226; border-radius:0 4px 4px 0;"></div>
+          </sc-if>
+          <div style="position:relative; flex:none; width:52px; height:52px; border-radius:50%; background:repeating-linear-gradient(45deg,#F4EFE7,#F4EFE7 6px,#EADFD0 6px,#EADFD0 12px); border:2px solid #EADFD0; display:flex; align-items:center; justify-content:center;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:8px; color:#a59f96;">PHOTO</span></div>
+          <div style="position:relative; flex:1; min-width:0;">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#B11226;">Provost</div>
+            <div style="font-family:'Epilogue'; font-weight:700; font-size:16px; color:#161616; line-height:1.2; margin-top:2px;">Dr. Sam Okafor</div>
+            <sc-if value="{{ showDurations }}" hint-placeholder-val="{{ true }}"><div style="display:flex; align-items:center; gap:6px; margin-top:5px;"><span style="width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid #8a847c;"></span><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; color:#8a847c;">3:38</span></div></sc-if>
+          </div>
+        </button>
+
+        <!-- Dean of Graduate Studies -->
+        <button onClick="{{ select2 }}" style="position:relative; width:100%; text-align:left; border:1px solid #EADFD0; background:#fff; border-radius:14px; padding:15px 16px; cursor:pointer; font-family:'Public Sans',sans-serif; display:flex; gap:13px; align-items:center;">
+          <sc-if value="{{ isActive2 }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; border:2px solid #B11226; border-radius:14px; pointer-events:none;"></div>
+            <div style="position:absolute; left:0; top:14px; bottom:14px; width:5px; background:#B11226; border-radius:0 4px 4px 0;"></div>
+          </sc-if>
+          <div style="position:relative; flex:none; width:52px; height:52px; border-radius:50%; background:repeating-linear-gradient(45deg,#F4EFE7,#F4EFE7 6px,#EADFD0 6px,#EADFD0 12px); border:2px solid #EADFD0; display:flex; align-items:center; justify-content:center;"><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:8px; color:#a59f96;">PHOTO</span></div>
+          <div style="position:relative; flex:1; min-width:0;">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#B11226;">Dean of Graduate Studies</div>
+            <div style="font-family:'Epilogue'; font-weight:700; font-size:16px; color:#161616; line-height:1.2; margin-top:2px;">Dr. Priya Menon</div>
+            <sc-if value="{{ showDurations }}" hint-placeholder-val="{{ true }}"><div style="display:flex; align-items:center; gap:6px; margin-top:5px;"><span style="width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid #8a847c;"></span><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; color:#8a847c;">5:05</span></div></sc-if>
+          </div>
+        </button>
+
+        <div style="border-top:1px solid #E0D6C8; margin-top:4px; padding-top:14px; font-size:13px; line-height:1.55; color:#6B6560;">New every fall. Watch all three before your first day to meet the people behind St. Cloud State.</div>
+      </div>
+
+      <!-- ===== RIGHT: player ===== -->
+      <div>
+
+        <!-- PLAYER 0 -->
+        <sc-if value="{{ isActive0 }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="position:relative; aspect-ratio:16/9; background:#161616; border-radius:16px; overflow:hidden;">
+              <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1d1d1d,#1d1d1d 16px,#202020 16px,#202020 32px);"></div>
+              <div style="position:absolute; inset:0; left:64%; background:#B11226; clip-path:polygon(30% 0, 100% 0, 100% 100%, 0% 100%); opacity:.92;"></div>
+              <div style="position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:7px; background:#B11226; padding:6px 11px; border-radius:5px; z-index:3;"><span style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #fff;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#fff;">YouTube</span></div>
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3;"><div style="width:84px; height:84px; border-radius:50%; background:rgba(250,247,242,.95); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,.35);"><span style="width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:30px solid #B11226; margin-left:7px;"></span></div></div>
+              <div style="position:absolute; left:0; right:0; bottom:0; padding:22px 24px 18px; background:linear-gradient(180deg, rgba(22,22,22,0), rgba(22,22,22,.85)); z-index:3;">
+                <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#F0B8C0;">President</div>
+                <div style="font-family:'Archivo',sans-serif; font-weight:900; font-size:28px; color:#FAF7F2; text-transform:uppercase; line-height:1; margin-top:6px; letter-spacing:-.01em;">A Husky Welcome</div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:14px;"><div style="flex:1; height:4px; background:rgba(255,255,255,.25); border-radius:2px; overflow:hidden;"><div style="width:22%; height:100%; background:#B11226;"></div></div><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; color:#EDE7E0;">0:57 / 4:12</span></div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:14px; margin-top:18px;">
+              <div style="flex:1;">
+                <h2 style="font-family:'Epilogue'; font-weight:700; font-size:24px; color:#161616; margin:0 0 6px;">Welcome from President Dr. Jordan Avery</h2>
+                <p style="font-size:16px; line-height:1.6; color:#4a463f; margin:0; max-width:560px;">A warm hello and a few words on what makes St. Cloud State feel like home — and why we're glad you chose to be a Husky.</p>
+              </div>
+              <a style="flex:none; display:inline-block; background:#B11226; color:#fff; font-family:'Public Sans'; font-weight:700; font-size:14px; padding:12px 22px; border-radius:30px; text-decoration:none; white-space:nowrap;">Watch on YouTube →</a>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PLAYER 1 -->
+        <sc-if value="{{ isActive1 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="position:relative; aspect-ratio:16/9; background:#161616; border-radius:16px; overflow:hidden;">
+              <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1d1d1d,#1d1d1d 16px,#202020 16px,#202020 32px);"></div>
+              <div style="position:absolute; inset:0; right:64%; background:#7E0C1A; clip-path:polygon(0 0, 70% 0, 100% 100%, 0 100%); opacity:.9;"></div>
+              <div style="position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:7px; background:#B11226; padding:6px 11px; border-radius:5px; z-index:3;"><span style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #fff;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#fff;">YouTube</span></div>
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3;"><div style="width:84px; height:84px; border-radius:50%; background:rgba(250,247,242,.95); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,.35);"><span style="width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:30px solid #B11226; margin-left:7px;"></span></div></div>
+              <div style="position:absolute; left:0; right:0; bottom:0; padding:22px 24px 18px; background:linear-gradient(180deg, rgba(22,22,22,0), rgba(22,22,22,.85)); z-index:3;">
+                <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#F0B8C0;">Provost</div>
+                <div style="font-family:'Archivo',sans-serif; font-weight:900; font-size:28px; color:#FAF7F2; text-transform:uppercase; line-height:1; margin-top:6px; letter-spacing:-.01em;">Your Path to Graduation</div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:14px;"><div style="flex:1; height:4px; background:rgba(255,255,255,.25); border-radius:2px; overflow:hidden;"><div style="width:22%; height:100%; background:#B11226;"></div></div><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; color:#EDE7E0;">0:49 / 3:38</span></div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:14px; margin-top:18px;">
+              <div style="flex:1;">
+                <h2 style="font-family:'Epilogue'; font-weight:700; font-size:24px; color:#161616; margin:0 0 6px;">Welcome from Provost Dr. Sam Okafor</h2>
+                <p style="font-size:16px; line-height:1.6; color:#4a463f; margin:0; max-width:560px;">An overview of your academics — the support, advising, and resources built to carry you from day one all the way to graduation.</p>
+              </div>
+              <a style="flex:none; display:inline-block; background:#B11226; color:#fff; font-family:'Public Sans'; font-weight:700; font-size:14px; padding:12px 22px; border-radius:30px; text-decoration:none; white-space:nowrap;">Watch on YouTube →</a>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PLAYER 2 -->
+        <sc-if value="{{ isActive2 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="position:relative; aspect-ratio:16/9; background:#161616; border-radius:16px; overflow:hidden;">
+              <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1d1d1d,#1d1d1d 16px,#202020 16px,#202020 32px);"></div>
+              <div style="position:absolute; inset:0; top:55%; background:#B11226; clip-path:polygon(0 38%, 100% 0, 100% 100%, 0 100%); opacity:.9;"></div>
+              <div style="position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:7px; background:#B11226; padding:6px 11px; border-radius:5px; z-index:3;"><span style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #fff;"></span><span style="font-family:'Archivo'; font-weight:800; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#fff;">YouTube</span></div>
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3;"><div style="width:84px; height:84px; border-radius:50%; background:rgba(250,247,242,.95); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,.35);"><span style="width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:30px solid #B11226; margin-left:7px;"></span></div></div>
+              <div style="position:absolute; left:0; right:0; bottom:0; padding:22px 24px 18px; background:linear-gradient(180deg, rgba(22,22,22,0), rgba(22,22,22,.85)); z-index:3;">
+                <div style="font-family:'Archivo'; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#F0B8C0;">Dean of Graduate Studies</div>
+                <div style="font-family:'Archivo',sans-serif; font-weight:900; font-size:28px; color:#FAF7F2; text-transform:uppercase; line-height:1; margin-top:6px; letter-spacing:-.01em;">For Our Grad Huskies</div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:14px;"><div style="flex:1; height:4px; background:rgba(255,255,255,.25); border-radius:2px; overflow:hidden;"><div style="width:22%; height:100%; background:#B11226;"></div></div><span style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:11px; color:#EDE7E0;">1:08 / 5:05</span></div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:14px; margin-top:18px;">
+              <div style="flex:1;">
+                <h2 style="font-family:'Epilogue'; font-weight:700; font-size:24px; color:#161616; margin:0 0 6px;">Welcome from Dean Dr. Priya Menon</h2>
+                <p style="font-size:16px; line-height:1.6; color:#4a463f; margin:0; max-width:560px;">For our graduate students — what to expect from research, funding and assistantships, and the close-knit community waiting for you.</p>
+              </div>
+              <a style="flex:none; display:inline-block; background:#B11226; color:#fff; font-family:'Public Sans'; font-weight:700; font-size:14px; padding:12px 22px; border-radius:30px; text-decoration:none; white-space:nowrap;">Watch on YouTube →</a>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+
+    <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+      <div style="font-family:'SFMono-Regular',ui-monospace,monospace; font-size:10.5px; color:#a59f96; margin-top:24px; line-height:1.6;">To go live in D2L: replace each poster with the speaker's YouTube embed (Insert &rarr; Insert Stuff &rarr; YouTube), point the "Watch on YouTube" button at the video URL, and drop in real headshots. The poster shown here is a placeholder.</div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;showDurations&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Display&quot; },
+  &quot;showNotes&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Display&quot; }
+}">
+class Component extends DCLogic {
+  state = { active: 0 };
+  renderVals() {
+    const a = this.state.active;
+    return {
+      isActive0: a === 0,
+      isActive1: a === 1,
+      isActive2: a === 2,
+      select0: () => this.setState({ active: 0 }),
+      select1: () => this.setState({ active: 1 }),
+      select2: () => this.setState({ active: 2 }),
+      showDurations: this.props.showDurations ?? true,
+      showNotes: this.props.showNotes ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>
