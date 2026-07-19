@@ -47,6 +47,31 @@ what actually happened so Weeks 02–16 deploy without re-discovery.
    sidebar populated, hash navigation loads an article.
 5. Updates: edit locally → re-upload the changed file(s) with **Overwrite**. Prose fix = one `.md`.
 
+## Cross-wiki links and the content-root mirror
+
+- The repo's `wiki/` folder mirrors the D2L content root exactly (shells at top level,
+  one `wNN/` or `res/` folder each). Local preview at `http://localhost:8266/wiki/...`
+  therefore behaves identically to D2L, including cross-wiki links.
+- Cross-wiki syntax in articles: `[[peer:article|label]]`, resolved through the `peers`
+  registry in each `wiki-data.js` (peer key → shell filename). Adding a new wiki means
+  adding its entry to every peer list.
+- Clicking a cross-wiki link navigates the topic iframe to the sibling shell with the
+  article as the `#hash`. Verified working live. D2L's breadcrumb still shows the
+  original topic; that's cosmetic.
+
+## Browser-automation gotchas (learned the hard way)
+
+- **The "Confirm File Replace" dialog needs real clicks.** Its checkboxes are shadow-DOM
+  components; ticking them from page JS silently fails and D2L then saves the upload as
+  `name(1).html` copies instead of overwriting. Click the dialog's select-all checkbox
+  and the Overwrite button by coordinates from a screenshot.
+- **Unit reordering** (new Lessons experience): drag events don't work from automation.
+  Click the unit's drag handle to enter keyboard-reorder mode; it shows real ▲▼ buttons
+  you can click. Watch the nesting level: moving up past a unit's topics first nests
+  INTO that unit; one more ▲ pops it above.
+- All prose follows `marks-voice-guide.md`: no em-dashes anywhere, including widget
+  labels, quiz strings, and article glue text.
+
 ## Hard rules (from the d2l-activity skills; they held here)
 
 - **Never rename a live topic and never open it in D2L's HTML editor** — both re-serialize
