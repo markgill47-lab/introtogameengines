@@ -35,3 +35,16 @@ The bottom strip maps your bundle onto [[bartle|Bartle's four players]]. Pick Ve
 ## Why this is the toy for this week
 
 Four sliders, and every idea in the module is hiding inside them. The rows are [[verbs-resources-feedback|verbs]] and [[mda|aesthetics]]. The collapse toward a single title is [[player-promises|player promises]] made concrete. The empty corners are [[scope|scope]] and opportunity in the same breath. The bottom strip is [[bartle|Bartle]]. Play with it until you can predict where a game lands before the list updates. When you can, you are reading games the way [[a12-template|Assignment 12]] will ask you to.
+
+## Check the data yourself
+
+Every game in the grid was tagged by hand against the rubric above, not pulled from a single external list. If a placement looks wrong to you, or you want to keep building the corpus, these are good places to check a game's genre, mode, and reception against a second opinion:
+
+- **[IGDB](https://www.igdb.com)** ("Internet Game Database"): genres, game modes, and platforms per title, closest match to the *What you do* and *Who with* rows.
+- **[MobyGames](https://www.mobygames.com)**: the deepest catalog for older and retro titles, useful for anything from the pre-2000 era.
+- **[Steam Popular Tags](https://store.steampowered.com/tag/browse)**: crowd-applied tags on the actual store pages, a decent gut check on what a game sells itself as, which is exactly the *How it feels* row.
+- **[RAWG](https://rawg.io)**: a searchable, filterable database if you want to browse by genre rather than look up one title at a time.
+- **[Bartle's taxonomy on Wikipedia](https://en.wikipedia.org/wiki/Bartle_taxonomy_of_player_types)**: the primary reference for the player-type mapping under the grid.
+- **[The MDA paper](https://users.cs.northwestern.edu/~hunicke/MDA.pdf)** (Hunicke, LeBlanc, Zubek): the same source already cited in [[mda|MDA]], for the *How it feels* row specifically.
+
+None of these are the single source of truth. They disagree with each other constantly, which is itself a useful lesson: genre is a convention, not a fact, and the grid's tags are one designer's read, not a verdict.
