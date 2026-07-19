@@ -1240,6 +1240,137 @@
       requestAnimationFrame(loop);
     },
 
+    /* The Promise Grid: pick one promise per row (four orthogonal axes),
+       see which of ~100 games keep ALL of them, and hunt for combinations no
+       game keeps. A live Bartle readout shows which player the bundle serves. */
+    promisegrid: function (mount) {
+      var PG = W.widgets.promisegrid;
+      var axes = PG.axes, games = PG.games, MAX = 5;
+      var sel = { d: null, w: null, s: null, f: null };
+
+      var bartleGloss = {
+        Achiever: 'they act on the world and want mastery and completion',
+        Explorer: 'they interact with the world and want discovery',
+        Socializer: 'they interact with other players and came for the people',
+        Killer: 'they act on other players and want to win against a human'
+      };
+      function bartle(s) {
+        var o = { Achiever: false, Explorer: false, Socializer: false, Killer: false };
+        if (s.w === 'versus'  || s.w === 'massive') o.Killer = true;
+        if (s.w === 'coop'    || s.w === 'massive') o.Socializer = true;
+        if (s.f === 'mastery' || s.f === 'power')   o.Achiever = true;
+        if ((s.w === 'solo' || !s.w) && (s.d === 'fight' || s.d === 'command')) o.Achiever = true;
+        if (s.d === 'explore' || s.d === 'solve' || s.s === 'persistent') o.Explorer = true;
+        return o;
+      }
+      function anySel() { return sel.d || sel.w || sel.s || sel.f; }
+      function matches() {
+        return games.filter(function (g) {
+          return axes.every(function (a) { return !sel[a.id] || g[a.id] === sel[a.id]; });
+        });
+      }
+
+      var css =
+        '<style>'
+        + '.pg-grid{display:grid;grid-template-columns:118px repeat(4,1fr);gap:7px;margin-top:12px;}'
+        + '.pg-rlab{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;line-height:1.3;}'
+        + '.pg-cell{cursor:pointer;border:1px solid var(--chip-border);background:var(--chip);color:var(--body);border-radius:8px;padding:11px 6px;font-family:var(--disp);font-weight:800;font-size:13px;text-align:center;transition:filter .12s;}'
+        + '.pg-cell:hover{filter:brightness(1.18);}'
+        + '.pg-cell.on{background:var(--red-wash);border-color:var(--red);color:var(--cream);box-shadow:0 0 0 1px var(--red) inset;}'
+        + '.pg-badge{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--chip-border);background:var(--panel);color:var(--faint);border-radius:20px;padding:5px 13px;transition:all .12s;}'
+        + '.pg-badge.on{border-color:var(--gold);color:var(--gold);background:#211b12;}'
+        + '.pg-game{font-family:var(--disp);font-weight:700;font-size:12.5px;color:var(--cream);background:var(--chip);border:1px solid var(--chip-border);border-radius:7px;padding:6px 11px;}'
+        + '</style>';
+
+      var rows = '';
+      axes.forEach(function (a) {
+        rows += '<div class="pg-rlab">' + esc(a.label) + '</div>';
+        a.cells.forEach(function (c) {
+          rows += '<button class="pg-cell" type="button" data-axis="' + a.id + '" data-cell="' + c.id + '">' + esc(c.label) + '</button>';
+        });
+      });
+
+      mount.innerHTML = css
+        + '<div class="wg-panel" style="padding:16px 18px;">'
+        + '<div class="wg-label">The Promise Grid · one promise per row</div>'
+        + '<div style="font-size:12px;color:var(--dim);margin-top:7px;line-height:1.6;">Every game is a bundle of promises. Pick one from each row and watch the games that keep <em>all</em> of them shrink toward a single title. Then go the other way: find four promises no game keeps.</div>'
+        + '<div style="overflow-x:auto;"><div class="pg-grid" style="min-width:460px;">' + rows + '</div></div>'
+        + '<div style="display:flex;align-items:center;gap:14px;margin-top:13px;flex-wrap:wrap;">'
+        +   '<button id="pg-clear" class="wg-btn" type="button" style="padding:7px 14px;font-size:12px;">Clear</button>'
+        +   '<span id="pg-count" style="font-family:var(--mono);font-size:11.5px;color:var(--mut);"></span>'
+        + '</div>'
+        + '<div id="pg-results" style="margin-top:11px;"></div>'
+        + '<div style="border-top:1px solid var(--panel-border);margin-top:15px;padding-top:13px;">'
+        +   '<div class="wg-label" style="font-size:10px;">Which player are you promising to?</div>'
+        +   '<div id="pg-bartle" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;"></div>'
+        +   '<div id="pg-bnote" style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:9px;line-height:1.6;"></div>'
+        + '</div>'
+        + '</div>';
+
+      function updateBartle() {
+        var box = mount.querySelector('#pg-bartle');
+        var note = mount.querySelector('#pg-bnote');
+        var b = bartle(sel);
+        var order = ['Achiever', 'Explorer', 'Socializer', 'Killer'];
+        box.innerHTML = order.map(function (k) {
+          return '<span class="pg-badge' + (b[k] ? ' on' : '') + '">' + k + '</span>';
+        }).join('');
+        var lit = order.filter(function (k) { return b[k]; });
+        if (!anySel()) {
+          note.textContent = 'Bartle sorted players on two axes: acting versus interacting, and the world versus other players. Build a promise and watch who lights up.';
+        } else if (lit.length === 0) {
+          note.textContent = 'This selection does not point cleanly at one type yet. Add a Who-with or a How-it-feels promise.';
+        } else if (lit.length >= 3) {
+          note.innerHTML = 'Serving <span style="color:var(--gold);">' + lit.join(', ') + '</span>: nearly everyone. That is what MMOs reach for and what most small games cannot afford.';
+        } else {
+          note.innerHTML = 'Serving <span style="color:var(--gold);">' + lit.join(', ') + '</span>: ' + esc(bartleGloss[lit[0]]) + '.';
+        }
+      }
+
+      function update() {
+        var cnt = mount.querySelector('#pg-count');
+        var res = mount.querySelector('#pg-results');
+        if (!anySel()) {
+          cnt.textContent = games.length + ' games loaded · nothing picked yet';
+          res.innerHTML = '<div style="font-size:12px;color:var(--dim);line-height:1.6;">Pick a promise above. Everything listed here will be a game that keeps every promise you choose.</div>';
+          updateBartle();
+          return;
+        }
+        var m = matches();
+        if (m.length === 0) {
+          cnt.textContent = '0 games keep these promises';
+          res.innerHTML = '<div style="background:#211b12;border:1px solid var(--gold);border-radius:9px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.65;"><strong style="color:var(--gold);">You found a gap.</strong> No game in this set of about a hundred keeps all of these promises at once. Now the real question: is it a <em>contradiction</em>, two promises that fight each other, like Cozy and Mastery? Or a <em>market gap</em>, a game nobody has built yet? A cozy versus game would be adorable. Someone should make it.</div>';
+          updateBartle();
+          return;
+        }
+        cnt.textContent = m.length + (m.length === 1 ? ' game keeps' : ' games keep') + ' these promises';
+        var html = '<div style="display:flex;gap:7px;flex-wrap:wrap;">';
+        m.slice(0, MAX).forEach(function (g) { html += '<span class="pg-game">' + esc(g.n) + '</span>'; });
+        html += '</div>';
+        if (m.length > MAX) {
+          html += '<div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:8px;">and ' + (m.length - MAX) + ' more · add another promise to narrow it down</div>';
+        }
+        res.innerHTML = html;
+        updateBartle();
+      }
+
+      mount.querySelectorAll('.pg-cell').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var ax = btn.getAttribute('data-axis'), c = btn.getAttribute('data-cell');
+          var wasOn = sel[ax] === c;
+          mount.querySelectorAll('.pg-cell[data-axis="' + ax + '"]').forEach(function (x) { x.classList.remove('on'); });
+          if (wasOn) { sel[ax] = null; } else { sel[ax] = c; btn.classList.add('on'); }
+          update();
+        });
+      });
+      mount.querySelector('#pg-clear').addEventListener('click', function () {
+        sel = { d: null, w: null, s: null, f: null };
+        mount.querySelectorAll('.pg-cell.on').forEach(function (x) { x.classList.remove('on'); });
+        update();
+      });
+      update();
+    },
+
     quiz: function (mount) {
       var Q = W.widgets.quiz;
       var best = lsGet('quizBest', null);
