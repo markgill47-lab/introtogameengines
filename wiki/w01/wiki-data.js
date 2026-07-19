@@ -41,6 +41,10 @@ window.SE266_WIKI = {
       { id: "audio-system", title: "The Audio System" },
       { id: "asset-pipeline", title: "The Asset Pipeline" }
     ]},
+    { name: "Supplemental", articles: [
+      { id: "the-render-pipeline", title: "The Render Pipeline" },
+      { id: "unity-lifecycle", title: "The Unity Lifecycle" }
+    ]},
     { name: "Engines", articles: [
       { id: "unity", title: "Unity" },
       { id: "godot", title: "Godot" },
@@ -58,10 +62,6 @@ window.SE266_WIKI = {
     ]},
     { name: "Check Yourself", articles: [
       { id: "check-yourself", title: "Check Yourself" }
-    ]},
-    { name: "Supplemental", articles: [
-      { id: "the-render-pipeline", title: "The Render Pipeline" },
-      { id: "unity-lifecycle", title: "The Unity Lifecycle" }
     ]}
   ],
 
