@@ -40,7 +40,9 @@ what actually happened so Weeks 02–16 deploy without re-discovery.
    file name **with `.html` stripped**. ("Add Existing → Course File" on an already-uploaded
    file keeps `.html` in the title — avoid for student-facing topics.)
 3. In Manage Files: create `wNN/` at root, upload `wiki-data.js`; create `wNN/articles/`,
-   upload all `.md` files (one multi-file upload works).
+   upload all `.md` files (one multi-file upload works). **Wait for the dialog's progress
+   bar to finish before clicking Save** — saving mid-upload fails with "Select at least
+   one file"; the files stay staged, so just Save again once staging completes.
 4. Verify inside the live topic (nested-iframe traversal): `SE266_WIKI_READY === true`,
    sidebar populated, hash navigation loads an article.
 5. Updates: edit locally → re-upload the changed file(s) with **Overwrite**. Prose fix = one `.md`.

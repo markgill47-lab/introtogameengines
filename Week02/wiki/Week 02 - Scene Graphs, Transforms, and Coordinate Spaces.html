@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Week 01 — Engines, Anatomy, and Choosing Yours</title>
+<title>Week 02 — Scene Graphs, Transforms, and Coordinate Spaces</title>
 <style>
   /* ============================================================
-   * SE 266 course wiki shell — Week 01
+   * SE 266 course wiki shell — Week 02
    * Styling follows the SCSU "Game Design Toolkit" design system.
    * Manifest + widget data load from wiki-data.js by dynamic
    * injection (static <script src> is inert in D2L topics);
@@ -272,7 +272,7 @@
 (function () {
   'use strict';
 
-  var BASE = 'w01/';       /* this week's content folder (data + articles live under it) */
+  var BASE = 'w02/';       /* this week's content folder (data + articles live under it) */
   window.SE266_WIKI_BASE = BASE;
 
   var W = null;            /* wiki-data.js payload */
@@ -391,90 +391,110 @@
   /* ================= widgets ================= */
   var widgets = {
 
-    anatomy: function (mount) {
-      var grid = el('div', 'wg-anatomy');
-      var seen = 0;
-      W.widgets.anatomy.forEach(function (o) {
-        var isSeen = visited.indexOf(o.id) >= 0;
-        if (isSeen) seen++;
-        var a = el('a', 'wg-organ' + (isSeen ? ' seen' : ''));
-        a.href = '#/' + o.id;
-        a.innerHTML = '<span style="flex:none;">' + o.icon + '</span>'
-          + '<span><span class="oname">' + esc(o.name) + '</span>'
-          + '<div class="oweek">' + esc(o.week) + '</div></span>'
-          + '<span class="tick">✓</span>';
-        grid.appendChild(a);
-      });
-      mount.appendChild(grid);
-      mount.appendChild(el('div', 'wg-anatomy-note',
-        'Each organ is its own article — explored ' + seen + '/' + W.widgets.anatomy.length + '.'));
+    /* Parent/child playground: drive the cart (parent) with sliders; the
+       pretzel child's LOCAL numbers stay frozen while its WORLD numbers move. */
+    transformlab: function (mount) {
+      var st = { x: 140, r: 0 };
+      var LX = 22, LY = -48, CY = 118;   /* child local offset; cart's world y */
+      mount.innerHTML =
+        '<div class="wg-panel" style="padding:16px 18px;">'
+        + '<div class="wg-label">Transform Playground · the cart is the parent</div>'
+        + '<svg viewBox="0 0 560 170" style="width:100%; height:auto; margin-top:10px; display:block;">'
+        +   '<line x1="0" y1="148" x2="560" y2="148" stroke="#2E2A20" stroke-width="3"/>'
+        +   '<line x1="0" y1="60" x2="560" y2="60" stroke="#1a1712" stroke-width="1" stroke-dasharray="5 6"/>'
+        +   '<g id="tl-cart">'
+        +     '<rect x="-52" y="-30" width="104" height="42" rx="6" fill="#241F18" stroke="#D8A24A" stroke-width="2"/>'
+        +     '<circle cx="-30" cy="18" r="10" fill="#0F0E0C" stroke="#C9C0B2" stroke-width="2"/>'
+        +     '<circle cx="30" cy="18" r="10" fill="#0F0E0C" stroke="#C9C0B2" stroke-width="2"/>'
+        +     '<circle cx="' + LX + '" cy="' + LY + '" r="9" fill="#B11226" stroke="#F0B8C0" stroke-width="2"/>'
+        +     '<text x="' + LX + '" y="' + (LY - 16) + '" fill="#8A8072" font-size="10" font-family="JetBrains Mono, monospace" text-anchor="middle">pretzel</text>'
+        +   '</g>'
+        + '</svg>'
+        + '<div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:12px;">'
+        +   '<div style="flex:1; min-width:180px;">'
+        +     '<div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--mut); margin-bottom:6px;"><span>cart position</span><span id="tl-xv"></span></div>'
+        +     '<input id="tl-x" type="range" min="60" max="500" value="' + st.x + '">'
+        +   '</div>'
+        +   '<div style="flex:1; min-width:180px;">'
+        +     '<div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--mut); margin-bottom:6px;"><span>cart rotation</span><span id="tl-rv"></span></div>'
+        +     '<input id="tl-r" type="range" min="-45" max="45" value="' + st.r + '">'
+        +   '</div>'
+        + '</div>'
+        + '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">'
+        +   '<div style="flex:1; min-width:220px; background:#14201a; border:1px solid #2c6b3a; border-radius:8px; padding:10px 13px; font-family:var(--mono); font-size:12px; color:var(--green);">local (the inspector): (' + LX + ', ' + LY + ') — never changes</div>'
+        +   '<div id="tl-world" style="flex:1; min-width:220px; background:var(--chip); border:1px solid var(--chip-border); border-radius:8px; padding:10px 13px; font-family:var(--mono); font-size:12px; color:var(--gold);"></div>'
+        + '</div>'
+        + '<div style="font-size:12px; color:var(--dim); margin-top:10px; line-height:1.6;">The pretzel is parented to the cart, so it stores only its offset <em>relative to the cart</em>. Drive the sliders: the local numbers sit still while the world answer changes. Attachment does the math.</div>'
+        + '</div>';
+      var cart = mount.querySelector('#tl-cart');
+      var xs = mount.querySelector('#tl-x'), rs = mount.querySelector('#tl-r');
+      function paint() {
+        cart.setAttribute('transform', 'translate(' + st.x + ',' + CY + ') rotate(' + st.r + ')');
+        var rad = st.r * Math.PI / 180;
+        var wx = st.x + LX * Math.cos(rad) - LY * Math.sin(rad);
+        var wy = CY + LX * Math.sin(rad) + LY * Math.cos(rad);
+        mount.querySelector('#tl-xv').textContent = st.x;
+        mount.querySelector('#tl-rv').textContent = st.r + '°';
+        mount.querySelector('#tl-world').textContent =
+          'world (composed): (' + wx.toFixed(1) + ', ' + wy.toFixed(1) + ')';
+      }
+      xs.addEventListener('input', function () { st.x = +xs.value; paint(); });
+      rs.addEventListener('input', function () { st.r = +rs.value; paint(); });
+      paint();
     },
 
-    chooser: function (mount) {
-      var C = W.widgets.chooser;
-      var answers = lsGet('chooser', {});
-      function paint() {
-        mount.innerHTML = '';
-        C.questions.forEach(function (q, qi) {
-          var card = el('div', 'wg-q');
-          var head = el('div', 'wg-qhead');
-          head.appendChild(el('span', 'wg-qnum', '0' + (qi + 1)));
-          head.appendChild(el('span', 'wg-qtext', esc(q.q)));
-          card.appendChild(head);
-          var opts = el('div', 'wg-opts');
-          q.options.forEach(function (opt, oi) {
-            var b = el('button', 'wg-opt' + (answers[q.id] === oi ? ' on' : ''), esc(opt.label));
-            b.addEventListener('click', function () {
-              answers[q.id] = oi; lsSet('chooser', answers); paint();
-            });
-            opts.appendChild(b);
-          });
-          card.appendChild(opts);
-          mount.appendChild(card);
-        });
-
-        var v = el('div', 'wg-verdict');
-        var answered = Object.keys(answers).length;
-        if (answered < C.questions.length) {
-          v.innerHTML = '<div class="wg-label">Where they point</div>'
-            + '<div class="wg-hint">Answer all four — ' + (C.questions.length - answered)
-            + ' to go. Deciding is the assignment.</div>';
-        } else {
-          var totals = { unity: 0, godot: 0, unreal: 0, three: 0 }, foots = [];
-          C.questions.forEach(function (q) {
-            var opt = q.options[answers[q.id]];
-            Object.keys(totals).forEach(function (k) { totals[k] += (opt.scores[k] || 0); });
-            if (opt.foot) foots.push(opt.foot);
-          });
-          var ranked = Object.keys(totals).map(function (k) { return { id: k, pts: totals[k] }; })
-            .sort(function (a, b) { return b.pts - a.pts; });
-          var tie = ranked[1].pts === ranked[0].pts;
-          if (tie && (ranked[0].id === 'unity' || ranked[1].id === 'unity')) {
-            ranked.sort(function (a, b) { return (b.pts - a.pts) || (a.id === 'unity' ? -1 : b.id === 'unity' ? 1 : 0); });
-          }
-          var max = Math.max(ranked[0].pts, 1);
-          var win = C.engines[ranked[0].id];
-          v.innerHTML = '<div class="wg-label">Where they point</div><div style="margin-top:10px;"></div>';
-          ranked.forEach(function (r, ri) {
-            var wpc = Math.round(Math.max(r.pts, 0) / max * 100);
-            v.appendChild(el('div', 'wg-bar-row' + (ri ? ' ru' : ''),
-              '<span class="wg-bar-name">' + esc(C.engines[r.id].name) + '</span>'
-              + '<span class="wg-bar-track"><span class="wg-bar-fill" style="width:' + wpc + '%;"></span></span>'
-              + '<span class="wg-bar-pts">' + r.pts + '</span>'));
-          });
-          var wd = el('div', 'wg-winner');
-          wd.innerHTML = '<a class="wg-wname" href="#/' + esc(win.article) + '">' + esc(win.name) + '</a>'
-            + '<span class="wg-wchip">' + esc(win.lang) + '</span>'
-            + '<span class="wg-wchip">' + esc(win.chip) + '</span>'
-            + '<div class="wg-agree">What you\'re agreeing to: ' + esc(win.agree)
-            + ' <a class="wl" href="#/' + esc(win.article) + '">Read the full profile →</a></div>'
-            + (tie ? '<div class="wg-foot">Dead heat at the top — ' + esc(C.tiebreak) + '</div>' : '')
-            + foots.map(function (f) { return '<div class="wg-foot">' + esc(f) + '</div>'; }).join('');
-          v.appendChild(wd);
-        }
-        mount.appendChild(v);
+    /* The pivot problem, suffered on purpose: blades rotating around their own
+       misplaced origin (flail) vs. around an empty parent at the hub (spin). */
+    pivotdemo: function (mount) {
+      var st = { fixed: false, a: 0 };
+      var HUBX = 280, HUBY = 84, ORIGY = 150;   /* hub vs. the blades' own origin */
+      mount.innerHTML =
+        '<div class="wg-panel" style="padding:16px 18px;">'
+        + '<div class="wg-label">The Pivot Problem · press both buttons</div>'
+        + '<svg viewBox="0 0 560 230" style="width:100%; height:auto; margin-top:10px; display:block;">'
+        +   '<line x1="0" y1="208" x2="560" y2="208" stroke="#2E2A20" stroke-width="3"/>'
+        +   '<path d="M268 208 L272 84 L288 84 L292 208 Z" fill="#241F18" stroke="#C9C0B2" stroke-width="2"/>'
+        +   '<g id="pv-rot"><g id="pv-blades">'
+        +     '<rect x="-78" y="-7" width="156" height="14" rx="5" fill="#241F18" stroke="#D8A24A" stroke-width="2"/>'
+        +     '<rect x="-7" y="-78" width="14" height="156" rx="5" fill="#241F18" stroke="#D8A24A" stroke-width="2"/>'
+        +     '<circle cx="0" cy="0" r="8" fill="#B11226" stroke="#F0B8C0" stroke-width="2"/>'
+        +   '</g></g>'
+        +   '<circle id="pv-org" cx="' + HUBX + '" cy="' + ORIGY + '" r="4" fill="#B11226"/>'
+        +   '<text id="pv-orglabel" x="' + (HUBX + 12) + '" y="' + (ORIGY + 4) + '" fill="#8A8072" font-size="10" font-family="JetBrains Mono, monospace">the blades’ own origin</text>'
+        + '</svg>'
+        + '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px;">'
+        +   '<button id="pv-wrong" class="wg-opt on">Blades’ own origin (wrong)</button>'
+        +   '<button id="pv-right" class="wg-opt">Empty parent at the hub (the fix)</button>'
+        +   '<span id="pv-status" style="margin-left:auto; font-family:var(--mono); font-size:12px; font-weight:700;"></span>'
+        + '</div>'
+        + '<div style="font-size:12px; color:var(--dim); margin-top:10px; line-height:1.6;">The blades always rotate around <em>their own origin</em>. You didn’t fix the blades — you wrapped them in a parent whose origin was correct. That maneuver works on every misbehaving asset you will ever import.</div>'
+        + '</div>';
+      var rot = mount.querySelector('#pv-rot'), blades = mount.querySelector('#pv-blades');
+      var bw = mount.querySelector('#pv-wrong'), br = mount.querySelector('#pv-right');
+      var status = mount.querySelector('#pv-status');
+      var org = mount.querySelector('#pv-org'), orgl = mount.querySelector('#pv-orglabel');
+      function mode() {
+        bw.className = 'wg-opt' + (st.fixed ? '' : ' on');
+        br.className = 'wg-opt' + (st.fixed ? ' on' : '');
+        org.style.display = st.fixed ? 'none' : '';
+        orgl.style.display = st.fixed ? 'none' : '';
+        status.textContent = st.fixed ? 'SPINNING — pivot is the hub' : 'FLAILING — wrong pivot';
+        status.style.color = st.fixed ? 'var(--green)' : 'var(--red)';
       }
-      paint();
+      bw.addEventListener('click', function () { st.fixed = false; mode(); });
+      br.addEventListener('click', function () { st.fixed = true; mode(); });
+      mode();
+      var last = null;
+      function tick(ts) {
+        if (!mount.isConnected) return;            /* article changed — stop */
+        if (last !== null) st.a = (st.a + (ts - last) * 0.06) % 360;
+        last = ts;
+        var cy = st.fixed ? HUBY : ORIGY;
+        rot.setAttribute('transform', 'rotate(' + st.a + ' ' + HUBX + ' ' + cy + ')');
+        blades.setAttribute('transform', 'translate(' + HUBX + ',' + HUBY + ')');
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
     },
 
     quiz: function (mount) {
@@ -655,7 +675,7 @@
       .then(function (md) { cache[id] = md; show(md); })
       .catch(function () {
         main.innerHTML = '<div class="wk-error">Couldn\'t load “' + esc(id) + '”.<br>'
-          + 'If you are the instructor: confirm <code>' + esc('w01/articles/' + id)
+          + 'If you are the instructor: confirm <code>' + esc('w02/articles/' + id)
           + '.md</code> was uploaded beside this file.</div>';
         renderSide(id, currentFilter());
       });
@@ -674,7 +694,7 @@
   window.SE266_WIKI_INIT = function (data) {
     if (!data) {
       document.getElementById('wk-main').innerHTML =
-        '<div class="wk-error">Could not load w01/wiki-data.js.<br>Confirm the w01 folder was uploaded beside this file.</div>';
+        '<div class="wk-error">Could not load w02/wiki-data.js.<br>Confirm the w02 folder was uploaded beside this file.</div>';
       return;
     }
     W = data;
