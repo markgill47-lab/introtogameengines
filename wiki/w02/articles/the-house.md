@@ -9,4 +9,4 @@ Your first [[standard-prefab|Standard Prefab]], cubes and all. Build it as one f
 5. Drag `House` from the Hierarchy into your Project folder. It's now a prefab. Stamp four more into the scene: that's a village, and it took four drags.
 6. Now the payoff demo. Open the prefab (double-click it), change the roof's color or swap a cube for a differently-shaped one *inside Visuals*, and watch every house in the village update. Then say the important part out loud for your future video: **nothing outside Visuals knew anything happened.**
 
-*This is [[a1-spec|A1's R4]] almost verbatim: two instances plus a propagating edit. Next: [[the-windmill|Exercise 3: The Windmill]].*
+*This is [[a1-spec|Assignment 1's Requirement 4]] almost verbatim: two instances plus a propagating edit. Next: [[the-windmill|Exercise 3: The Windmill]].*

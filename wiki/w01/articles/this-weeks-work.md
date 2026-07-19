@@ -1,6 +1,6 @@
 # This Week's Work
 
-No paced assignment this week, but **A1 lands next week** and assumes all four required boxes are checked. A student debugging their install during Week 2 is a student doing Week 1 late.
+No paced assignment this week, but **Assignment 1 lands next week** and assumes all four required boxes are checked. A student debugging their install during Week 2 is a student doing Week 1 late.
 
 Four boxes to check, in order:
 

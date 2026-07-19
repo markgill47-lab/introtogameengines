@@ -1,6 +1,6 @@
 # Check Yourself
 
-Before you record A1, see if you can answer these without looking:
+Before you record Assignment 1, see if you can answer these without looking:
 
 1. The cart rolls thirty feet down the aisle while the plane crosses a state line. Describe the pretzels' motion in [[local-vs-world|local space, then in world space]], one sentence each.
 2. Your windmill blade orbits wildly instead of spinning in place. What's wrong, and what's [[the-pivot|the universal fix]]?

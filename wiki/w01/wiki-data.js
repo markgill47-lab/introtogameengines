@@ -236,7 +236,7 @@ window.SE266_WIKI = {
         { id: "tour", label: "Five-station anatomy tour rebuilt in your engine", optional: true },
         { id: "discord", label: "Introduced yourself on the course Discord with your engine pick", optional: true }
       ],
-      note: "This checklist lives in this browser only: a personal tracker, not the gradebook. A1 lands next week and assumes the four required boxes are checked."
+      note: "This checklist lives in this browser only: a personal tracker, not the gradebook. Assignment 1 lands next week and assumes the four required boxes are checked."
     }
   }
 };

@@ -40,8 +40,8 @@ window.SE266_WIKI = {
       { id: "other-engines", title: "Other Engines" }
     ]},
     { name: "Assignment", articles: [
-      { id: "a1-spec", title: "A1: Scenes & Transforms" },
-      { id: "recording-a1", title: "Recording Your A1 Video" }
+      { id: "a1-spec", title: "Assignment 1: Scenes & Transforms" },
+      { id: "recording-a1", title: "Recording Your Assignment 1 Video" }
     ]},
     { name: "Check Yourself", articles: [
       { id: "check-yourself", title: "Check Yourself" }
@@ -91,12 +91,12 @@ window.SE266_WIKI = {
 
     checklist: {
       items: [
-        { id: "r1", label: "R1 · A real hierarchy: 4+ primitives, 3+ levels deep, moving the parent moves the assembly, shown live", optional: false },
-        { id: "r2", label: "R2 · Local vs. world demonstrated: inspector visible, local frozen while world changes, one sentence of why", optional: false },
-        { id: "r3", label: "R3 · Parented motion around a correct pivot, no flailing", optional: false },
-        { id: "r4", label: "R4 · Standard Prefab: two instances in scene + an edit inside Visuals propagating to all", optional: false },
-        { id: "r5", label: "R5 · Deliberate camera + one sentence of intent", optional: false },
-        { id: "r6", label: "R6 · Deliverables: narrated video (2–5 min), source, one-paragraph build note", optional: false }
+        { id: "r1", label: "Requirement 1 · A real hierarchy: 4+ primitives, 3+ levels deep, moving the parent moves the assembly, shown live", optional: false },
+        { id: "r2", label: "Requirement 2 · Local vs. world demonstrated: inspector visible, local frozen while world changes, one sentence of why", optional: false },
+        { id: "r3", label: "Requirement 3 · Parented motion around a correct pivot, no flailing", optional: false },
+        { id: "r4", label: "Requirement 4 · Standard Prefab: two instances in scene + an edit inside Visuals propagating to all", optional: false },
+        { id: "r5", label: "Requirement 5 · Deliberate camera + one sentence of intent", optional: false },
+        { id: "r6", label: "Requirement 6 · Deliverables: narrated video (2–5 min), source, one-paragraph build note", optional: false }
       ],
       note: "A personal tracker only: this browser, not the gradebook. Pass requires all six; a failed submission comes back with the specific requirement(s) that missed. Fix and resubmit. The queue is the queue."
     }

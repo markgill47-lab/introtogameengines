@@ -10,7 +10,7 @@ The scene graph makes that intuition executable:
 - Every object stores its position, rotation, and scale **relative to its parent**: its [[transforms|transform]].
 - Moving a parent moves its entire subtree, automatically, recursively, for free.
 
-And the "for free" is the point. When the plane banks, the engine walks down the tree (plane, then cabin, then cart, then the pretzels on the cart) and composes each object's "relative to my parent" numbers into a final "relative to the world" answer. You will never write that code. You'll just arrange the tree so that it produces the right answer, which turns out to be a design skill, and it's the skill [[a1-spec|A1]] grades.
+And the "for free" is the point. When the plane banks, the engine walks down the tree (plane, then cabin, then cart, then the pretzels on the cart) and composes each object's "relative to my parent" numbers into a final "relative to the world" answer. You will never write that code. You'll just arrange the tree so that it produces the right answer, which turns out to be a design skill, and it's the skill [[a1-spec|Assignment 1]] grades.
 
 ## One direction matters
 

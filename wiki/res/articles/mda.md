@@ -6,4 +6,4 @@ The original workshop paper behind Week 4's design framework: Mechanics, Dynamic
 
 ## Where it pairs with the course
 
-**Week 4's backbone**, as the direct primary source. And a professional note: citing the actual paper in your A12 game deconstruction is a good look. Most people cite a YouTube summary of a blog post about it. Don't be most people.
+**Week 4's backbone**, as the direct primary source. And a professional note: citing the actual paper in your Assignment 12 game deconstruction is a good look. Most people cite a YouTube summary of a blog post about it. Don't be most people.

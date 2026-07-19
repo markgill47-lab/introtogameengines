@@ -25,4 +25,4 @@ public class Spin : MonoBehaviour
 4. The fix: create an Empty named `BladePivot`, position it exactly at the hub (where the blades should spin), parent the blade cubes to it, and move the `Spin` script to the pivot. Play again. It spins like a windmill, because now "its own origin" is exactly where you decided it should be.
 5. File the lesson where you'll find it again: **you didn't fix the blades. You wrapped them in a parent whose origin was correct.** That maneuver works on every misbehaving asset you will ever import.
 
-*This is [[a1-spec|A1's R3]]. Flailing counts as a fail, and yes, I can tell. Next: [[the-shot|Exercise 4: The Shot]].*
+*This is [[a1-spec|Assignment 1's Requirement 3]]. Flailing counts as a fail, and yes, I can tell. Next: [[the-shot|Exercise 4: The Shot]].*

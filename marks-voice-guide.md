@@ -126,3 +126,4 @@ Most single pieces of content will lean on one register but can borrow from anot
 ## Addendum: Rules Added in Working Sessions
 
 - **"Honest caveat" is banned, along with its cousins ("honest warning," "honest tradeoff," "honestly fine").** Redundant: a caveat that's not honest isn't a caveat. Say caveat, warning, or tradeoff, unqualified. (Added 2026-07-18.)
+- **No course-shorthand acronyms in student-facing text.** Write "Assignment 1," "Requirement 3," never "A1" or "R3": compressed course jargon is a wall for ESL students and first-generation students alike. Industry acronyms with real currency (MDA, FSM, PBR, LTS, A* the algorithm) are fine, defined once in passing per the vocabulary habits above. (Added 2026-07-19.)

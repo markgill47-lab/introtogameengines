@@ -21,4 +21,4 @@ ThingName          <- the parent: logic components and physics colliders
 
 There's a deeper pattern hiding inside this structure. I'm not going to name it yet; Week 9 does, and it's better as a reveal. For now: separate what a thing *is* from how it *looks*, and put the split in the hierarchy where everyone can see it.
 
-*Build your first one in [[the-house|Exercise 2: The House]]. It's graded: [[a1-spec|A1's R4]].*
+*Build your first one in [[the-house|Exercise 2: The House]]. It's graded: [[a1-spec|Assignment 1's Requirement 4]].*
