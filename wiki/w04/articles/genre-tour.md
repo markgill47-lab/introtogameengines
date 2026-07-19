@@ -24,4 +24,4 @@ Fully deconstructed as [[tetris-deconstruction|your worked example]], using ever
 
 Five genres, one toolkit. That is the pitch for this week, delivered.
 
-*Next: [[scope|Scope]], the last piece of vocabulary and the one that saves your semester.*
+*Next: [[malicious-design|Malicious Design]], the same toolkit pointed the wrong way.*

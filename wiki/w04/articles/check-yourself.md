@@ -7,6 +7,7 @@ See if you can answer these without looking:
 3. Name one positive and one negative [[verbs-resources-feedback|feedback loop]] from games you know that are not already in the genre tour.
 4. What is Tetris's central [[verbs-resources-feedback|resource]], and what does spending it look like? *([[tetris-deconstruction|answer here]])*
 5. Your dream game has fourteen verbs. What is the move, and which section told you? *([[scope|hint]])*
+6. A game gives you free rewards for an hour, then a wall you can pay to skip. Name the pattern, and state the one question that separates malicious design from honest design. *([[malicious-design|hint]])*
 
 ## Or let the wiki quiz you
 
