@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 04 · Design Vocabulary, What Makes Games Games</title>
+<style>
+  /* ============================================================
+   * SE 266 course wiki shell: Week 04
+   * Styling follows the SCSU "Game Design Toolkit" design system.
+   * Manifest + widget data load from wiki-data.js by dynamic
+   * injection (static <script src> is inert in D2L topics);
+   * articles are markdown files in articles/, loaded via fetch()
+   * (same-origin with the LMS, verified working in the sandbox).
+   * ============================================================ */
+  * { box-sizing: border-box; }
+  body { margin: 0; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+  :root {
+    --bg: #131210;         --card: #1C1915;       --card-border: #2E2A20;
+    --panel: #0F0E0C;      --panel-border: #2A261E;
+    --chip: #241F18;       --chip-border: #3A342A;
+    --red: #B11226;        --red-dark: #7E0C1A;   --red-wash: #2A1216;
+    --gold: #D8A24A;       --cream: #FAF7F2;      --ink: #ECE5D8;
+    --body: #C9C0B2;       --mut: #9D9284;        --dim: #8A8072;  --faint: #6E665A;
+    --green: #6FBF73;      --pink: #F0B8C0;       --rose: #E7B9C0;
+    --sans: 'Public Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --disp: 'Archivo', 'Arial Black', 'Avenir Next Condensed', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  input[type=range] { accent-color: var(--red); width: 100%; height: 4px; }
+
+  /* FIXED PIXEL HEIGHT: the D2L iframe sizes to content; never 100vh.
+     The sidebar and the article pane scroll independently inside it. */
+  .wk-root { height: 880px; width: 100%; background: var(--bg); font-family: var(--sans);
+             display: flex; flex-direction: column; overflow: hidden; border-radius: 14px; }
+
+  /* ---- header bar (editor-window pattern, slim) ---- */
+  .wk-head { flex: none; background: var(--card); border-bottom: 1px solid var(--card-border);
+             padding: 12px 20px; display: flex; align-items: center; gap: 14px; }
+  .wk-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+  .wk-title-zone { min-width: 0; }
+  .wk-kicker { font-family: var(--mono); font-size: 10px; letter-spacing: .13em;
+               text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  .wk-title { font-family: var(--disp); font-weight: 900; font-size: 17px; letter-spacing: -.01em;
+              text-transform: uppercase; color: var(--cream); white-space: nowrap; overflow: hidden;
+              text-overflow: ellipsis; }
+  .wk-search { margin-left: auto; flex: none; width: 220px; position: relative; }
+  .wk-search input { width: 100%; background: var(--panel); border: 1px solid var(--chip-border);
+                     border-radius: 20px; color: var(--ink); font-family: var(--mono); font-size: 12px;
+                     padding: 7px 14px; outline: none; }
+  .wk-search input:focus { border-color: var(--gold); }
+  .wk-search input::placeholder { color: var(--faint); }
+  .wk-ready { flex: none; display: flex; align-items: center; gap: 7px;
+              font-family: var(--mono); font-size: 11px; color: var(--green); }
+
+  /* ---- body: sidebar + article ---- */
+  .wk-body { flex: 1; min-height: 0; display: flex; }
+
+  .wk-side { flex: none; width: 248px; border-right: 1px solid var(--card-border);
+             overflow-y: auto; padding: 16px 12px 24px; background: #161310; }
+  .wk-sect { font-family: var(--mono); font-size: 10px; letter-spacing: .13em; text-transform: uppercase;
+             color: var(--gold); margin: 16px 8px 7px; display: flex; align-items: center; gap: 8px; }
+  .wk-sect:first-child { margin-top: 0; }
+  .wk-sect::after { content: ""; flex: 1; height: 1px; background: var(--card-border); }
+  .wk-link { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px;
+             cursor: pointer; color: var(--body); font-size: 13px; line-height: 1.35;
+             text-decoration: none; border: 1px solid transparent; }
+  .wk-link:hover { background: #231F19; color: var(--ink); }
+  .wk-link.on { background: var(--red-wash); border-color: var(--red); color: var(--cream); }
+  .wk-link .v { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--green);
+                visibility: hidden; flex: none; }
+  .wk-link.seen .v { visibility: visible; }
+  .wk-progress { margin: 18px 8px 0; font-family: var(--mono); font-size: 10px; color: var(--faint); }
+  .wk-progress .bar { height: 5px; background: var(--chip); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .wk-progress .fill { height: 100%; background: linear-gradient(90deg, var(--red-dark), var(--red)); border-radius: 3px; }
+
+  .wk-main { flex: 1; min-width: 0; overflow-y: auto; padding: 26px 34px 48px; }
+  .wk-art { max-width: 720px; margin: 0 auto; }
+
+  /* ---- article typography ---- */
+  .wk-art h1 { font-family: var(--disp); font-weight: 900; font-size: 32px; line-height: 1.02;
+               letter-spacing: -.02em; text-transform: uppercase; color: var(--cream); margin: 0 0 6px;
+               padding-bottom: 14px; border-bottom: 1px solid var(--card-border); position: relative; }
+  .wk-art h1::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+                      background: var(--red); }
+  .wk-art h2 { font-family: var(--disp); font-weight: 800; font-size: 19px; letter-spacing: -.01em;
+               text-transform: uppercase; color: var(--cream); margin: 30px 0 10px;
+               display: flex; align-items: center; gap: 10px; }
+  .wk-art h2::before { content: ""; width: 0; height: 0; border-left: 7px solid transparent;
+                       border-right: 7px solid transparent; border-bottom: 11px solid var(--red); flex: none; }
+  .wk-art h3 { font-family: var(--disp); font-weight: 800; font-size: 15px; color: var(--gold);
+               margin: 22px 0 8px; }
+  .wk-art p { font-size: 15px; line-height: 1.7; color: var(--body); margin: 14px 0; }
+  .wk-art strong { color: var(--cream); }
+  .wk-art em { color: var(--ink); }
+  .wk-art ul, .wk-art ol { margin: 14px 0; padding-left: 24px; }
+  .wk-art li { font-size: 15px; line-height: 1.65; color: var(--body); margin: 7px 0; }
+  .wk-art li::marker { color: var(--red); font-family: var(--mono); }
+  .wk-art blockquote { margin: 16px 0; padding: 12px 16px; background: var(--panel);
+                       border: 1px solid var(--panel-border); border-left: 3px solid var(--gold);
+                       border-radius: 8px; }
+  .wk-art blockquote p { margin: 4px 0; font-size: 13.5px; line-height: 1.6; color: var(--mut); }
+  .wk-art code { font-family: var(--mono); font-size: .88em; color: var(--pink);
+                 background: var(--chip); border: 1px solid var(--chip-border);
+                 border-radius: 4px; padding: 1px 6px; }
+  .wk-art pre { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 10px;
+                padding: 16px 18px; overflow-x: auto; margin: 16px 0; }
+  .wk-art pre code { background: none; border: none; padding: 0; color: var(--body);
+                     font-size: 13px; line-height: 1.8; }
+  .wk-art .tablewrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--panel-border); border-radius: 10px; }
+  .wk-art table { border-collapse: collapse; width: 100%; min-width: 620px; background: var(--panel); font-size: 13px; }
+  .wk-art th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+               color: var(--gold); text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--card-border); }
+  .wk-art td { padding: 9px 14px; color: var(--body); border-bottom: 1px solid var(--panel-border); line-height: 1.5; }
+  .wk-art tr:last-child td { border-bottom: none; }
+  .wk-art td:first-child { color: var(--cream); }
+  .wk-art hr { border: none; height: 1px; background: var(--card-border); margin: 26px 0; }
+  .wk-art a { color: var(--rose); text-decoration: none; border-bottom: 1px solid rgba(231,185,192,.35); }
+  .wk-art a:hover { color: var(--cream); border-bottom-color: var(--cream); }
+  .wk-art a.wl { color: var(--rose); }
+  .wk-art a.wl-missing { color: var(--red); border-bottom: 1px dashed var(--red); cursor: help; }
+  .wk-art a.wl-x { border-bottom-style: dashed; }
+  .wk-art a.wl-x::after { content: " ⧉"; font-size: .75em; color: var(--gold); }
+  .wk-art a.ext::after { content: " ↗"; font-size: .8em; color: var(--faint); }
+
+  /* ---- article footer nav ---- */
+  .wk-footnav { max-width: 720px; margin: 40px auto 0; padding-top: 16px;
+                border-top: 1px solid var(--card-border); display: flex; gap: 10px; }
+  .wk-fbtn { cursor: pointer; border: 1px solid var(--chip-border); background: var(--chip);
+             color: var(--ink); font-family: var(--mono); font-size: 12px; padding: 9px 14px;
+             border-radius: 7px; text-decoration: none; max-width: 48%; overflow: hidden;
+             text-overflow: ellipsis; white-space: nowrap; }
+  .wk-fbtn:hover { filter: brightness(1.12); }
+  .wk-fbtn.next { margin-left: auto; }
+
+  /* ---- widgets (shared pieces) ---- */
+  .wg { margin: 20px 0; }
+  .wg-panel { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px; }
+  .wg-label { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+              color: var(--gold); }
+  .wg-btn { cursor: pointer; border: none; background: var(--red); color: var(--cream);
+            font-family: var(--disp); font-weight: 800; font-size: 13px; text-transform: uppercase;
+            letter-spacing: .04em; padding: 9px 18px; border-radius: 7px;
+            display: inline-flex; align-items: center; gap: 8px; }
+  .wg-btn:hover { filter: brightness(1.12); }
+  .wg-btn:disabled { opacity: .4; cursor: default; filter: none; }
+
+  /* anatomy nav grid */
+  .wg-anatomy { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .wg-organ { cursor: pointer; background: var(--panel); border: 2px solid var(--panel-border);
+              border-radius: 10px; padding: 12px; text-align: left; display: flex; align-items: center;
+              gap: 10px; text-decoration: none; }
+  .wg-organ:hover { background: #231F19; }
+  .wg-organ .oname { font-family: var(--disp); font-weight: 800; font-size: 12.5px; color: var(--cream); line-height: 1.2; }
+  .wg-organ .oweek { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 2px; }
+  .wg-organ .tick { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--green);
+                    visibility: hidden; flex: none; }
+  .wg-organ.seen .tick { visibility: visible; }
+  .wg-anatomy-note { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-top: 10px; }
+
+  /* chooser */
+  .wg-q { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px;
+          padding: 16px 18px; margin-bottom: 12px; }
+  .wg-qhead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .wg-qnum { font-family: var(--mono); font-size: 11px; color: var(--red); font-weight: 700; flex: none; }
+  .wg-qtext { font-family: var(--disp); font-weight: 800; font-size: 14px; color: var(--cream); }
+  .wg-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .wg-opt { cursor: pointer; border: 1px solid var(--chip-border); background: var(--chip); color: var(--body);
+            font-family: var(--mono); font-size: 11.5px; padding: 8px 13px; border-radius: 20px; }
+  .wg-opt:hover { filter: brightness(1.15); }
+  .wg-opt.on { background: var(--red-wash); border-color: var(--red); color: var(--cream); }
+  .wg-verdict { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px;
+                padding: 16px 18px; }
+  .wg-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .wg-bar-name { font-family: var(--disp); font-weight: 800; font-size: 12.5px; color: var(--cream);
+                 width: 76px; flex: none; }
+  .wg-bar-track { flex: 1; height: 8px; background: var(--chip); border-radius: 5px; overflow: hidden; }
+  .wg-bar-fill { height: 100%; display: block; border-radius: 5px;
+                 background: linear-gradient(90deg, var(--red-dark), var(--red)); transition: width .4s ease; }
+  .wg-bar-row.ru .wg-bar-fill { background: #3F382C; }
+  .wg-bar-pts { font-family: var(--mono); font-size: 11px; color: var(--dim); width: 30px;
+                text-align: right; flex: none; }
+  .wg-winner { margin-top: 12px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
+  .wg-wname { font-family: var(--disp); font-weight: 900; font-size: 20px; text-transform: uppercase;
+              color: var(--cream); text-decoration: none; border-bottom: 2px solid var(--red); }
+  .wg-wname:hover { color: var(--rose); }
+  .wg-wchip { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+              color: var(--gold); border: 1px solid var(--chip-border); background: var(--chip);
+              border-radius: 20px; padding: 3px 10px; margin-left: 8px; vertical-align: 3px; }
+  .wg-agree { margin-top: 8px; font-size: 12.5px; line-height: 1.6; color: var(--pink); }
+  .wg-foot { margin-top: 8px; font-family: var(--mono); font-size: 11px; color: var(--gold); line-height: 1.6; }
+  .wg-hint { font-family: var(--mono); font-size: 11.5px; color: var(--faint); padding: 4px 0; }
+
+  /* quiz (dialogue-box pattern) */
+  .wg-dlg { position: relative; padding: 20px 20px 18px; border: 2px solid var(--chip-border);
+            border-radius: 12px; background: var(--panel); margin-top: 16px; }
+  .wg-dlg-who { position: absolute; top: -13px; left: 18px; background: var(--red); color: var(--cream);
+                font-family: var(--disp); font-weight: 800; font-size: 13px; padding: 5px 14px;
+                border-radius: 6px; }
+  .wg-dlg-q { font-size: 15px; line-height: 1.6; color: var(--ink); margin: 8px 0 14px; }
+  .wg-answers { display: flex; flex-direction: column; gap: 8px; }
+  .wg-ans { cursor: pointer; text-align: left; border: 1px solid var(--chip-border); background: var(--chip);
+            color: var(--body); font-family: var(--sans); font-size: 13.5px; line-height: 1.45;
+            padding: 10px 13px; border-radius: 9px; }
+  .wg-ans:hover { filter: brightness(1.13); }
+  .wg-ans.right { border-color: var(--green); color: var(--green); background: #14201a; }
+  .wg-ans.wrong { border-color: var(--red); color: var(--pink); background: var(--red-wash); }
+  .wg-ans:disabled { cursor: default; }
+  .wg-ans:disabled:hover { filter: none; }
+  .wg-explain { margin-top: 12px; border-left: 3px solid var(--gold); padding: 2px 0 2px 12px;
+                font-size: 13px; line-height: 1.6; color: var(--mut); }
+  .wg-dlg-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+  .wg-dlg-num { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  .wg-score-big { font-family: var(--disp); font-weight: 900; font-size: 40px; color: var(--cream); line-height: 1; }
+  .wg-score-sub { font-family: var(--mono); font-size: 12px; color: var(--dim); margin-top: 8px; }
+
+  /* checklist */
+  .wg-check { display: flex; align-items: flex-start; gap: 13px; padding: 12px 15px; cursor: pointer;
+              border-bottom: 1px solid var(--panel-border); }
+  .wg-check:last-child { border-bottom: none; }
+  .wg-check:hover { background: #17140f; }
+  .wg-box { flex: none; width: 20px; height: 20px; border: 2px solid var(--chip-border); border-radius: 5px;
+            margin-top: 1px; display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-size: 13px; color: var(--cream); }
+  .wg-check.done .wg-box { background: var(--red); border-color: var(--red); }
+  .wg-check .ctext { font-size: 14px; line-height: 1.5; color: var(--ink); }
+  .wg-check.done .ctext { color: var(--faint); text-decoration: line-through; }
+  .wg-opt-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+                color: var(--gold); margin-left: 8px; }
+  .wg-track { height: 8px; background: var(--chip); border-radius: 5px; overflow: hidden; margin: 10px 0 14px; }
+  .wg-fill { height: 100%; background: linear-gradient(90deg, var(--red-dark), var(--red));
+             border-radius: 5px; transition: width .35s ease; }
+  .wg-note { font-size: 12px; line-height: 1.6; color: var(--dim); margin-top: 12px; }
+  .wg-done-line { margin-top: 8px; font-family: var(--mono); font-size: 12px; color: var(--green); }
+
+  /* solar system (supplemental) */
+  .wg-ss-row { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 12px; }
+  .wg-ss-insp { flex: none; width: 214px; background: var(--panel); border: 1px solid var(--panel-border);
+                border-radius: 10px; padding: 12px 14px; }
+  .wg-ss-h { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+             color: var(--gold); margin: 12px 0 6px; }
+  .wg-ss-h:first-child { margin-top: 0; }
+  .wg-ss-node { display: block; width: 100%; text-align: left; cursor: pointer; background: none; border: none;
+                border-radius: 6px; padding: 4px 8px; font-family: var(--mono); font-size: 12px; color: var(--body); }
+  .wg-ss-node:hover { background: #231F19; color: var(--ink); }
+  .wg-ss-node.sel { background: var(--red-wash); color: var(--cream); outline: 1px solid var(--red); }
+  .wg-ss-node .k { color: var(--faint); font-size: 10px; margin-left: 6px; }
+  .wg-ss-selname { font-family: var(--disp); font-weight: 800; font-size: 14px; color: var(--cream); }
+  .wg-ss-selkind { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+                   color: var(--pink); margin-left: 7px; }
+  .wg-ss-tr { font-family: var(--mono); font-size: 11.5px; color: var(--ink); line-height: 1.9; }
+  .wg-ss-tr b { color: var(--dim); font-weight: 400; display: inline-block; width: 62px; }
+  .wg-ss-note { font-family: var(--sans); font-size: 11.5px; color: var(--dim); line-height: 1.55; margin-top: 10px; }
+  .wg-ss-view { flex: 1; min-width: 300px; border: 1px solid var(--panel-border); border-radius: 10px;
+                background-color: #0F0E0C; display: block;
+                background-image: linear-gradient(#1a1712 1px, transparent 1px),
+                                  linear-gradient(90deg, #1a1712 1px, transparent 1px);
+                background-size: 24px 24px; }
+  .wg-ss-arm { stroke: #B11226; stroke-width: 1.5; stroke-dasharray: 5 4; opacity: .65; pointer-events: none; }
+  .wg-ss-body { cursor: pointer; }
+  .wg-ss-body.sel { stroke: #FAF7F2 !important; stroke-width: 2.5; }
+  .wg-ss-pivot { cursor: pointer; }
+  .wg-ss-pivot line { stroke: #F0B8C0; stroke-width: 2; }
+  .wg-ss-pivot .dot { fill: #B11226; }
+  .wg-ss-pivot .hit { fill: transparent; }
+  .wg-ss-pivot.sel line { stroke: #FAF7F2; }
+  .wg-ss-pivot.sel .dot { fill: #FAF7F2; }
+
+  /* prefab lab (supplemental) */
+  .wg-pl-head { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+                color: var(--gold); margin: 12px 0 6px; }
+  .wg-pl-scene { border: 1px solid var(--panel-border); border-radius: 10px; background-color: #0F0E0C;
+                 background-image: linear-gradient(#1a1712 1px, transparent 1px),
+                                   linear-gradient(90deg, #1a1712 1px, transparent 1px);
+                 background-size: 24px 24px; display: flex; justify-content: space-around; align-items: flex-end;
+                 padding: 18px 10px 10px; min-height: 132px; }
+  .wg-pl-inst { text-align: center; }
+  .wg-pl-inst .nm { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 3px; }
+  .wg-pl-assets { display: flex; gap: 12px; margin-top: 4px; align-items: stretch; justify-content: center;
+                  flex-wrap: wrap; }
+  .wg-pl-card { background: var(--card); border: 1px solid var(--chip-border); border-radius: 12px;
+                padding: 10px 12px 12px; width: 138px; text-align: center;
+                -webkit-user-select: none; user-select: none; }
+  .wg-pl-card .ttl { font-family: var(--mono); font-size: 11px; color: var(--ink); }
+  .wg-pl-card .tag { font-family: var(--mono); font-size: 9.5px; color: var(--faint); margin-top: 4px; }
+  .wg-pl-glyph { cursor: grab; touch-action: none; display: flex; justify-content: center; padding: 4px 0 2px; }
+  .wg-pl-glyph:active { cursor: grabbing; }
+  .wg-pl-prefab { border: 2px dashed var(--gold); width: 154px; }
+  .wg-pl-prefab .wg-pl-glyph { cursor: default; }
+  .wg-pl-prefab.over { border-color: var(--cream); background: #231F19; border-style: solid; }
+  .wg-pl-sw { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 7px; }
+  .wg-pl-sw button { width: 17px; height: 17px; border-radius: 4px; border: 1px solid rgba(0,0,0,.45);
+                     cursor: pointer; padding: 0; }
+  .wg-pl-sw button.sel { outline: 2px solid var(--cream); outline-offset: 1px; }
+  .wg-pl-ghost { position: fixed; z-index: 99; pointer-events: none; opacity: .85; margin: -24px 0 0 -24px; }
+
+  /* rate lab (supplemental) */
+  .wg-rl-view { border: 1px solid var(--panel-border); border-radius: 10px; background: #0F0E0C;
+                height: 320px; overflow: hidden; position: relative; }
+  .wg-rl-view canvas { display: block; }
+  .wg-rl-badge { position: absolute; top: 8px; right: 10px; font-family: var(--mono); font-size: 10px;
+                 color: var(--faint); pointer-events: none; }
+  .wg-rl-ctl { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; align-items: flex-start; }
+  .wg-rl-slider { flex: 1; min-width: 200px; }
+  .wg-rl-slider .lbl { display: flex; justify-content: space-between; font-family: var(--mono);
+                       font-size: 11px; color: var(--mut); margin-bottom: 6px; }
+  .wg-rl-slider .lbl .val { color: var(--gold); }
+  .wg-rl-toggle { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  .wg-rl-note { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; margin-top: 8px; }
+  .wg-rl-note.honest { color: var(--green); }
+  .wg-rl-note.bug { color: var(--pink); }
+  .wg-rl-read { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
+  /* side-scroller (supplemental) */
+  .wg-ss2-view { position: relative; border: 1px solid var(--panel-border); border-radius: 10px;
+                 overflow: hidden; background: #0F0E0C; height: 300px; }
+  .wg-ss2-view canvas { display: block; outline: none; }
+  .wg-ss2-focus { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+                  background: rgba(15,14,12,.72); cursor: pointer; font-family: var(--mono);
+                  font-size: 13px; color: var(--cream); letter-spacing: .04em; }
+  .wg-ss2-focus.hide { display: none; }
+  .wg-ss2-focus span { border: 1px solid var(--chip-border); border-radius: 20px; padding: 9px 18px;
+                       background: var(--chip); }
+  .wg-ss2-hud { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .wg-ss2-flag { flex: 1; min-width: 150px; background: var(--panel); border: 1px solid var(--panel-border);
+                 border-radius: 10px; padding: 11px 13px; transition: border-color .1s, background .1s; }
+  .wg-ss2-flag .fn { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--dim); }
+  .wg-ss2-flag .ctl { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 2px; }
+  .wg-ss2-flag .tag { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 6px; }
+  .wg-ss2-flag .cnt { font-family: var(--disp); font-weight: 900; font-size: 22px; color: var(--ink); margin-top: 4px; }
+  .wg-ss2-flag.key.lit { border-color: var(--green); background: #14201a; }
+  .wg-ss2-flag.key.lit .fn { color: var(--green); }
+  .wg-ss2-flag.edge.lit { border-color: var(--gold); background: #241f14; }
+  .wg-ss2-flag.edge.lit .fn { color: var(--gold); }
+  .wg-ss2-legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px;
+                   color: var(--mut); margin-top: 12px; }
+  .wg-ss2-legend span { display: flex; align-items: center; gap: 6px; }
+  .wg-ss2-legend .sw { width: 13px; height: 13px; border-radius: 3px; }
+
+  .wk-error { padding: 48px 20px; text-align: center; font-family: var(--mono); font-size: 13px;
+              color: var(--pink); line-height: 1.8; }
+
+  @media (max-width: 720px) {
+    .wk-side { display: none; }
+    .wg-anatomy { grid-template-columns: 1fr; }
+    .wk-search { width: 130px; }
+    .wk-title { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wk-root">
+  <div class="wk-head">
+    <div style="display:flex; gap:6px; flex:none;">
+      <span class="wk-dot" style="background:#B11226;"></span>
+      <span class="wk-dot" style="background:#D8A24A;"></span>
+      <span class="wk-dot" style="background:#4d4a42;"></span>
+    </div>
+    <div class="wk-title-zone">
+      <div class="wk-kicker" id="wk-kicker">SE 266 · Course Wiki</div>
+      <div class="wk-title" id="wk-title">Loading…</div>
+    </div>
+    <div class="wk-search"><input id="wk-search" type="text" placeholder="search articles…" autocomplete="off"></div>
+    <div class="wk-ready"><span style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid #6FBF73;"></span>wiki</div>
+  </div>
+  <div class="wk-body">
+    <nav class="wk-side" id="wk-side"></nav>
+    <main class="wk-main" id="wk-main">
+      <div class="wk-error">Loading…</div>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var BASE = 'w04/';       /* this week's content folder (data + articles live under it) */
+  window.SE266_WIKI_BASE = BASE;
+
+  var W = null;            /* wiki-data.js payload */
+  var NS = '';             /* localStorage namespace, set after data loads */
+  var cache = {};          /* fetched article markdown by id */
+  var flat = [];           /* flattened article order for prev/next */
+  var titles = {};         /* id -> title */
+  var visited = [];
+  var quizState = { idx: 0, picked: null, score: 0, done: false };
+
+  function lsGet(key, fallback) {
+    try { var v = localStorage.getItem(NS + key); return v === null ? fallback : JSON.parse(v); }
+    catch (e) { return fallback; }
+  }
+  function lsSet(key, val) {
+    try { localStorage.setItem(NS + key, JSON.stringify(val)); } catch (e) {}
+  }
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html !== undefined) n.innerHTML = html;
+    return n;
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* ================= markdown ================= */
+  function inline(s) {
+    s = esc(s);
+    /* code spans first so nothing inside them gets styled */
+    s = s.replace(/`([^`]+)`/g, function (_, c) { return '<code>' + c + '</code>'; });
+    /* wiki links [[id|label]] / [[id]] */
+    s = s.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, function (_, id, label) { return wikiLink(id.trim(), label); });
+    s = s.replace(/\[\[([^\]]+)\]\]/g, function (_, id) { return wikiLink(id.trim(), titles[id.trim()] || id.trim()); });
+    /* external links */
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a class="ext" href="$2" target="_blank" rel="noopener">$1</a>');
+    /* bold, then italic */
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    return s;
+  }
+  function wikiLink(id, label) {
+    /* cross-wiki links: [[peer:article|label]] resolves through W.peers to a
+       sibling shell at the content root, carrying the article as a #hash */
+    var m = id.match(/^([a-z0-9]+):(.+)$/);
+    if (m) {
+      if (W.peers && W.peers[m[1]]) {
+        return '<a class="wl wl-x" href="' + encodeURI(W.peers[m[1]]) + '#/' + m[2] + '">' + label + '</a>';
+      }
+      return '<a class="wl-missing" title="No wiki named “' + m[1] + '” in peers">' + label + '</a>';
+    }
+    if (titles[id]) return '<a class="wl" href="#/' + id + '">' + label + '</a>';
+    return '<a class="wl-missing" title="No article named “' + id + '” yet">' + label + '</a>';
+  }
+  function markdown(md) {
+    var lines = md.split(/\r?\n/), out = [], i = 0;
+    while (i < lines.length) {
+      var L = lines[i];
+
+      if (/^```/.test(L)) {                       /* fenced code */
+        var code = []; i++;
+        while (i < lines.length && !/^```/.test(lines[i])) { code.push(lines[i]); i++; }
+        i++;
+        out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>');
+        continue;
+      }
+      if (/^\{\{widget:([a-z-]+)\}\}\s*$/.test(L)) {   /* widget mount point */
+        var wname = L.match(/^\{\{widget:([a-z-]+)\}\}/)[1];
+        out.push('<div class="wg" data-widget="' + wname + '"></div>');
+        i++; continue;
+      }
+      if (/^###\s+/.test(L)) { out.push('<h3>' + inline(L.replace(/^###\s+/, '')) + '</h3>'); i++; continue; }
+      if (/^##\s+/.test(L))  { out.push('<h2>' + inline(L.replace(/^##\s+/, ''))  + '</h2>'); i++; continue; }
+      if (/^#\s+/.test(L))   { out.push('<h1>' + inline(L.replace(/^#\s+/, ''))   + '</h1>'); i++; continue; }
+      if (/^---+\s*$/.test(L)) { out.push('<hr>'); i++; continue; }
+
+      if (/^\|/.test(L)) {                        /* table */
+        var trows = [];
+        while (i < lines.length && /^\|/.test(lines[i])) { trows.push(lines[i]); i++; }
+        var parsed = trows.map(function (r) {
+          return r.replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); });
+        }).filter(function (r) {
+          return !r.every(function (c) { return /^:?-+:?$/.test(c) || c === ''; });
+        });
+        var thead = parsed.shift() || [];
+        out.push('<div class="tablewrap"><table><thead><tr>'
+          + thead.map(function (c) { return '<th>' + inline(c) + '</th>'; }).join('')
+          + '</tr></thead><tbody>'
+          + parsed.map(function (r) {
+              return '<tr>' + r.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>';
+            }).join('')
+          + '</tbody></table></div>');
+        continue;
+      }
+      if (/^>\s?/.test(L)) {                      /* blockquote */
+        var q = [];
+        while (i < lines.length && /^>\s?/.test(lines[i])) { q.push(lines[i].replace(/^>\s?/, '')); i++; }
+        out.push('<blockquote>' + q.filter(function (x) { return x.trim(); })
+          .map(function (x) { return '<p>' + inline(x) + '</p>'; }).join('') + '</blockquote>');
+        continue;
+      }
+      if (/^[-*]\s+/.test(L)) {                   /* unordered list */
+        var ul = [];
+        while (i < lines.length && /^[-*]\s+/.test(lines[i])) { ul.push(lines[i].replace(/^[-*]\s+/, '')); i++; }
+        out.push('<ul>' + ul.map(function (x) { return '<li>' + inline(x) + '</li>'; }).join('') + '</ul>');
+        continue;
+      }
+      if (/^\d+\.\s+/.test(L)) {                  /* ordered list */
+        var ol = [];
+        while (i < lines.length && /^\d+\.\s+/.test(lines[i])) { ol.push(lines[i].replace(/^\d+\.\s+/, '')); i++; }
+        out.push('<ol>' + ol.map(function (x) { return '<li>' + inline(x) + '</li>'; }).join('') + '</ol>');
+        continue;
+      }
+      if (!L.trim()) { i++; continue; }
+
+      var p = [];                                 /* paragraph */
+      while (i < lines.length && lines[i].trim()
+             && !/^(#{1,3}\s|>|[-*]\s|\d+\.\s|```|---|\{\{|\|)/.test(lines[i])) { p.push(lines[i]); i++; }
+      out.push('<p>' + inline(p.join(' ')) + '</p>');
+    }
+    return out.join('\n');
+  }
+
+  /* ================= widgets ================= */
+  var widgets = {
+
+    /* Parent/child playground: drive the cart (parent) with sliders; the
+       pretzel child's LOCAL numbers stay frozen while its WORLD numbers move. */
+    transformlab: function (mount) {
+      var st = { x: 140, r: 0 };
+      var LX = 22, LY = -48, CY = 118;   /* child local offset; cart's world y */
+      mount.innerHTML =
+        '<div class="wg-panel" style="padding:16px 18px;">'
+        + '<div class="wg-label">Transform Playground · the cart is the parent</div>'
+        + '<svg viewBox="0 0 560 170" style="width:100%; height:auto; margin-top:10px; display:block;">'
+        +   '<line x1="0" y1="148" x2="560" y2="148" stroke="#2E2A20" stroke-width="3"/>'
+        +   '<line x1="0" y1="60" x2="560" y2="60" stroke="#1a1712" stroke-width="1" stroke-dasharray="5 6"/>'
+        +   '<g id="tl-cart">'
+        +     '<rect x="-52" y="-30" width="104" height="42" rx="6" fill="#241F18" stroke="#D8A24A" stroke-width="2"/>'
+        +     '<circle cx="-30" cy="18" r="10" fill="#0F0E0C" stroke="#C9C0B2" stroke-width="2"/>'
+        +     '<circle cx="30" cy="18" r="10" fill="#0F0E0C" stroke="#C9C0B2" stroke-width="2"/>'
+        +     '<circle cx="' + LX + '" cy="' + LY + '" r="9" fill="#B11226" stroke="#F0B8C0" stroke-width="2"/>'
+        +     '<text x="' + LX + '" y="' + (LY - 16) + '" fill="#8A8072" font-size="10" font-family="JetBrains Mono, monospace" text-anchor="middle">pretzel</text>'
+        +   '</g>'
+        + '</svg>'
+        + '<div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:12px;">'
+        +   '<div style="flex:1; min-width:180px;">'
+        +     '<div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--mut); margin-bottom:6px;"><span>cart position</span><span id="tl-xv"></span></div>'
+        +     '<input id="tl-x" type="range" min="60" max="500" value="' + st.x + '">'
+        +   '</div>'
+        +   '<div style="flex:1; min-width:180px;">'
+        +     '<div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:11px; color:var(--mut); margin-bottom:6px;"><span>cart rotation</span><span id="tl-rv"></span></div>'
+        +     '<input id="tl-r" type="range" min="-45" max="45" value="' + st.r + '">'
+        +   '</div>'
+        + '</div>'
+        + '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">'
+        +   '<div style="flex:1; min-width:220px; background:#14201a; border:1px solid #2c6b3a; border-radius:8px; padding:10px 13px; font-family:var(--mono); font-size:12px; color:var(--green);">local (the inspector): (' + LX + ', ' + LY + '): never changes</div>'
+        +   '<div id="tl-world" style="flex:1; min-width:220px; background:var(--chip); border:1px solid var(--chip-border); border-radius:8px; padding:10px 13px; font-family:var(--mono); font-size:12px; color:var(--gold);"></div>'
+        + '</div>'
+        + '<div style="font-size:12px; color:var(--dim); margin-top:10px; line-height:1.6;">The pretzel is parented to the cart, so it stores only its offset <em>relative to the cart</em>. Drive the sliders: the local numbers sit still while the world answer changes. Attachment does the math.</div>'
+        + '</div>';
+      var cart = mount.querySelector('#tl-cart');
+      var xs = mount.querySelector('#tl-x'), rs = mount.querySelector('#tl-r');
+      function paint() {
+        cart.setAttribute('transform', 'translate(' + st.x + ',' + CY + ') rotate(' + st.r + ')');
+        var rad = st.r * Math.PI / 180;
+        var wx = st.x + LX * Math.cos(rad) - LY * Math.sin(rad);
+        var wy = CY + LX * Math.sin(rad) + LY * Math.cos(rad);
+        mount.querySelector('#tl-xv').textContent = st.x;
+        mount.querySelector('#tl-rv').textContent = st.r + '°';
+        mount.querySelector('#tl-world').textContent =
+          'world (composed): (' + wx.toFixed(1) + ', ' + wy.toFixed(1) + ')';
+      }
+      xs.addEventListener('input', function () { st.x = +xs.value; paint(); });
+      rs.addEventListener('input', function () { st.r = +rs.value; paint(); });
+      paint();
+    },
+
+    /* The pivot problem, suffered on purpose: blades rotating around their own
+       misplaced origin (flail) vs. around an empty parent at the hub (spin). */
+    pivotdemo: function (mount) {
+      var st = { fixed: false, a: 0 };
+      var HUBX = 280, HUBY = 84, ORIGY = 150;   /* hub vs. the blades' own origin */
+      mount.innerHTML =
+        '<div class="wg-panel" style="padding:16px 18px;">'
+        + '<div class="wg-label">The Pivot Problem · press both buttons</div>'
+        + '<svg viewBox="0 0 560 230" style="width:100%; height:auto; margin-top:10px; display:block;">'
+        +   '<line x1="0" y1="208" x2="560" y2="208" stroke="#2E2A20" stroke-width="3"/>'
+        +   '<path d="M268 208 L272 84 L288 84 L292 208 Z" fill="#241F18" stroke="#C9C0B2" stroke-width="2"/>'
+        +   '<g id="pv-rot"><g id="pv-blades">'
+        +     '<rect x="-78" y="-7" width="156" height="14" rx="5" fill="#241F18" stroke="#D8A24A" stroke-width="2"/>'
+        +     '<rect x="-7" y="-78" width="14" height="156" rx="5" fill="#241F18" stroke="#D8A24A" stroke-width="2"/>'
+        +     '<circle cx="0" cy="0" r="8" fill="#B11226" stroke="#F0B8C0" stroke-width="2"/>'
+        +   '</g></g>'
+        +   '<circle id="pv-org" cx="' + HUBX + '" cy="' + ORIGY + '" r="4" fill="#B11226"/>'
+        +   '<text id="pv-orglabel" x="' + (HUBX + 12) + '" y="' + (ORIGY + 4) + '" fill="#8A8072" font-size="10" font-family="JetBrains Mono, monospace">the blades’ own origin</text>'
+        + '</svg>'
+        + '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px;">'
+        +   '<button id="pv-wrong" class="wg-opt on">Blades’ own origin (wrong)</button>'
+        +   '<button id="pv-right" class="wg-opt">Empty parent at the hub (the fix)</button>'
+        +   '<span id="pv-status" style="margin-left:auto; font-family:var(--mono); font-size:12px; font-weight:700;"></span>'
+        + '</div>'
+        + '<div style="font-size:12px; color:var(--dim); margin-top:10px; line-height:1.6;">The blades always rotate around <em>their own origin</em>. You didn’t fix the blades: you wrapped them in a parent whose origin was correct. That maneuver works on every misbehaving asset you will ever import.</div>'
+        + '</div>';
+      var rot = mount.querySelector('#pv-rot'), blades = mount.querySelector('#pv-blades');
+      var bw = mount.querySelector('#pv-wrong'), br = mount.querySelector('#pv-right');
+      var status = mount.querySelector('#pv-status');
+      var org = mount.querySelector('#pv-org'), orgl = mount.querySelector('#pv-orglabel');
+      function mode() {
+        bw.className = 'wg-opt' + (st.fixed ? '' : ' on');
+        br.className = 'wg-opt' + (st.fixed ? ' on' : '');
+        org.style.display = st.fixed ? 'none' : '';
+        orgl.style.display = st.fixed ? 'none' : '';
+        status.textContent = st.fixed ? 'SPINNING: pivot is the hub' : 'FLAILING: wrong pivot';
+        status.style.color = st.fixed ? 'var(--green)' : 'var(--red)';
+      }
+      bw.addEventListener('click', function () { st.fixed = false; mode(); });
+      br.addEventListener('click', function () { st.fixed = true; mode(); });
+      mode();
+      var last = null;
+      function tick(ts) {
+        if (!mount.isConnected) return;            /* article changed: stop */
+        if (last !== null) st.a = (st.a + (ts - last) * 0.06) % 360;
+        last = ts;
+        var cy = st.fixed ? HUBY : ORIGY;
+        rot.setAttribute('transform', 'rotate(' + st.a + ' ' + HUBX + ' ' + cy + ')');
+        blades.setAttribute('transform', 'translate(' + HUBX + ',' + HUBY + ')');
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    },
+
+    /* solar system: sun at center, earth orbits sun, moon orbits earth,
+       animated purely by rotating two pivot empties. Select bodies or
+       pivots in the scene or the hierarchy; a mini-inspector shows the
+       local transform (frozen) and the world position (sweeping). */
+    solarsystem: function (mount) {
+      var SS = W.widgets.solarsystem;
+      var EARTH_ARM = 130, MOON_ARM = 48;
+      var st = { a: 0, b: 0, sel: 'earth' };
+      var byId = {};
+      SS.nodes.forEach(function (n) { byId[n.id] = n; });
+      var LOCAL = { sun: [0,0,0], earthpivot: [0,0,0], earth: [EARTH_ARM,0,0], moonpivot: [0,0,0], moon: [MOON_ARM,0,0] };
+
+      function crosshair(id) {
+        return '<g class="wg-ss-pivot" data-node="' + id + '">'
+          + '<line x1="-7" y1="0" x2="7" y2="0"/><line x1="0" y1="-7" x2="0" y2="7"/>'
+          + '<circle class="dot" r="2.5"/><circle class="hit" r="12"/></g>';
+      }
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">The Solar System · two spinning empties</div>'
+        + '<div class="wg-ss-row">'
+        + '<div class="wg-ss-insp">'
+        +   '<div class="wg-ss-h">Hierarchy</div><div class="wg-ss-tree"></div>'
+        +   '<div class="wg-ss-h">Inspector</div>'
+        +   '<div><span class="wg-ss-selname"></span><span class="wg-ss-selkind"></span></div>'
+        +   '<div class="wg-ss-tr" style="margin-top:6px;">'
+        +     '<div><b>Position</b><span class="v-pos"></span></div>'
+        +     '<div><b>Rotation</b><span class="v-rot"></span></div>'
+        +     '<div><b>Scale</b><span class="v-scl">(1, 1, 1)</span></div>'
+        +     '<div><b>World</b><span class="v-wld"></span></div>'
+        +   '</div>'
+        +   '<div class="wg-ss-note"></div>'
+        + '</div>'
+        + '<svg class="wg-ss-view" viewBox="0 0 470 430">'
+        +   '<g transform="translate(235,215)">'
+        +     '<circle r="48" fill="#D8A24A" opacity=".14"/>'
+        +     '<circle class="wg-ss-body" data-node="sun" r="40" fill="#D8A24A" stroke="#8a6a2f" stroke-width="1.5"/>'
+        +     '<g class="ss-apiv">'
+        +       '<line class="wg-ss-arm" x1="0" y1="0" x2="' + EARTH_ARM + '" y2="0"/>'
+        +       crosshair('earthpivot')
+        +       '<g transform="translate(' + EARTH_ARM + ',0)">'
+        +         '<circle class="wg-ss-body" data-node="earth" r="16" fill="#2E4A6B" stroke="#4a6f96" stroke-width="1.5"/>'
+        +         '<g class="ss-bpiv">'
+        +           '<line class="wg-ss-arm" x1="0" y1="0" x2="' + MOON_ARM + '" y2="0"/>'
+        +           crosshair('moonpivot')
+        +           '<g transform="translate(' + MOON_ARM + ',0)">'
+        +             '<circle class="wg-ss-body" data-node="moon" r="7" fill="#9D9284" stroke="#C9C0B2" stroke-width="1.2"/>'
+        +           '</g>'
+        +         '</g>'
+        +       '</g>'
+        +     '</g>'
+        +   '</g>'
+        + '</svg>'
+        + '</div>'
+        + '<div class="wg-rp-note" style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:8px 0;">' + esc(SS.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var tree = panel.querySelector('.wg-ss-tree');
+      SS.nodes.forEach(function (n) {
+        var b = el('button', 'wg-ss-node' + (st.sel === n.id ? ' sel' : ''));
+        b.style.paddingLeft = (8 + n.depth * 13) + 'px';
+        b.setAttribute('data-node', n.id);
+        b.innerHTML = esc(n.name) + (n.kind === 'pivot' ? '<span class="k">pivot</span>' : '');
+        tree.appendChild(b);
+      });
+
+      function fmt(v) { return '(' + v.map(function (x) { return Math.round(x); }).join(', ') + ')'; }
+      function select(id) {
+        st.sel = id;
+        panel.querySelectorAll('.wg-ss-node').forEach(function (r) {
+          r.className = 'wg-ss-node' + (r.getAttribute('data-node') === id ? ' sel' : '');
+        });
+        panel.querySelectorAll('[data-node].wg-ss-body, [data-node].wg-ss-pivot').forEach(function (s) {
+          s.classList.toggle('sel', s.getAttribute('data-node') === id);
+        });
+        var n = byId[id];
+        panel.querySelector('.wg-ss-selname').textContent = n.name;
+        panel.querySelector('.wg-ss-selkind').textContent = n.kind;
+        panel.querySelector('.v-pos').textContent = fmt(LOCAL[id]);
+        panel.querySelector('.wg-ss-note').textContent = n.note;
+        live();
+      }
+      function live() {
+        var rot = st.sel === 'earthpivot' ? st.a : st.sel === 'moonpivot' ? st.b : 0;
+        panel.querySelector('.v-rot').textContent = '(0, 0, ' + Math.round(((rot % 360) + 360) % 360) + '°)';
+        var ra = st.a * Math.PI / 180, rb = (st.a + st.b) * Math.PI / 180;
+        var ew = [EARTH_ARM * Math.cos(ra), EARTH_ARM * Math.sin(ra)];
+        var mw = [ew[0] + MOON_ARM * Math.cos(rb), ew[1] + MOON_ARM * Math.sin(rb)];
+        var world = { sun: [0,0], earthpivot: [0,0], earth: ew, moonpivot: ew, moon: mw }[st.sel];
+        panel.querySelector('.v-wld').textContent = '(' + Math.round(world[0]) + ', ' + Math.round(world[1]) + ', 0)';
+      }
+      panel.querySelectorAll('[data-node]').forEach(function (s) {
+        s.addEventListener('click', function () { select(s.getAttribute('data-node')); });
+      });
+
+      var apiv = panel.querySelector('.ss-apiv'), bpiv = panel.querySelector('.ss-bpiv');
+      var last = null;
+      function tick(ts) {
+        if (!mount.isConnected) return;
+        if (last !== null) {
+          var dt = Math.min((ts - last) / 1000, 0.05);   /* clamp: no teleporting after a throttled tab */
+          st.a = (st.a + 18 * dt) % 360;
+          st.b = (st.b + 66 * dt) % 360;
+        }
+        last = ts;
+        apiv.setAttribute('transform', 'rotate(' + st.a + ')');
+        bpiv.setAttribute('transform', 'rotate(' + st.b + ')');
+        live();
+        requestAnimationFrame(tick);
+      }
+      select(st.sel);
+      requestAnimationFrame(tick);
+    },
+
+    /* prefab lab: scene on top with three instances of one prefab; assets
+       below with a Cube and a House flanking the prefab slot. Dragging an
+       asset onto the prefab redefines it; recoloring an asset propagates
+       to the prefab and every instance. */
+    prefablab: function (mount) {
+      var PL = W.widgets.prefablab;
+      var st = { prefab: 'cube', colors: { cube: PL.defaults.cube, house: PL.defaults.house } };
+
+      function glyph(type, color, size) {
+        var body = type === 'cube'
+          ? '<polygon points="20,30 60,30 60,70 20,70" fill="' + color + '"/>'
+            + '<polygon points="20,30 35,18 75,18 60,30" fill="' + color + '"/>'
+            + '<polygon points="20,30 35,18 75,18 60,30" fill="#FFFFFF" fill-opacity=".28"/>'
+            + '<polygon points="60,30 75,18 75,58 60,70" fill="' + color + '"/>'
+            + '<polygon points="60,30 75,18 75,58 60,70" fill="#000000" fill-opacity=".3"/>'
+            + '<polygon points="20,30 60,30 60,70 20,70" fill="none" stroke="#0F0E0C" stroke-opacity=".4"/>'
+          : '<polygon points="14,40 40,16 66,40" fill="' + color + '"/>'
+            + '<polygon points="14,40 40,16 66,40" fill="#000000" fill-opacity=".3"/>'
+            + '<rect x="19" y="40" width="42" height="32" fill="' + color + '"/>'
+            + '<rect x="34" y="52" width="12" height="20" fill="#0F0E0C" fill-opacity=".6"/>'
+            + '<rect x="24" y="45" width="8" height="7" fill="#FFFFFF" fill-opacity=".35"/>';
+        return '<svg viewBox="0 0 80 80" width="' + size + '" height="' + size + '">' + body + '</svg>';
+      }
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">Prefabs · edit once, every copy updates</div>'
+        + '<div class="wg-pl-head">' + esc(PL.sceneHead) + '</div>'
+        + '<div class="wg-pl-scene">'
+        +   [0,1,2].map(function (i) {
+              return '<div class="wg-pl-inst"><span class="g"></span>'
+                + '<div class="nm">Building' + (i ? ' (' + i + ')' : '') + '</div></div>';
+            }).join('')
+        + '</div>'
+        + '<div class="wg-pl-head">' + esc(PL.assetsHead) + '</div>'
+        + '<div class="wg-pl-assets">'
+        +   '<div class="wg-pl-card" data-asset="cube"><div class="ttl">Cube</div>'
+        +     '<div class="wg-pl-glyph"></div><div class="wg-pl-sw"></div></div>'
+        +   '<div class="wg-pl-card wg-pl-prefab"><div class="ttl">' + esc(PL.prefabName) + '</div>'
+        +     '<div class="wg-pl-glyph"></div><div class="tag">' + esc(PL.prefabTag) + '</div></div>'
+        +   '<div class="wg-pl-card" data-asset="house"><div class="ttl">House</div>'
+        +     '<div class="wg-pl-glyph"></div><div class="wg-pl-sw"></div></div>'
+        + '</div>'
+        + '<div style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:10px 0 8px;">' + esc(PL.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var prefabCard = panel.querySelector('.wg-pl-prefab');
+
+      function renderAsset(type) {
+        var card = panel.querySelector('[data-asset="' + type + '"]');
+        card.querySelector('.wg-pl-glyph').innerHTML = glyph(type, st.colors[type], 62);
+        var sw = card.querySelector('.wg-pl-sw');
+        sw.innerHTML = '';
+        PL.colors.forEach(function (c) {
+          var b = el('button', st.colors[type] === c ? 'sel' : '');
+          b.style.background = c;
+          b.setAttribute('aria-label', type + ' color ' + c);
+          b.addEventListener('click', function () {
+            st.colors[type] = c;
+            renderAsset(type);
+            if (st.prefab === type) { renderPrefab(); renderScene(); }
+          });
+          sw.appendChild(b);
+        });
+      }
+      function renderPrefab() {
+        prefabCard.querySelector('.wg-pl-glyph').innerHTML = glyph(st.prefab, st.colors[st.prefab], 62);
+      }
+      function renderScene() {
+        panel.querySelectorAll('.wg-pl-inst .g').forEach(function (s) {
+          s.innerHTML = glyph(st.prefab, st.colors[st.prefab], 66);
+        });
+      }
+
+      /* pointer-based drag: asset glyph to prefab slot (copy, never move) */
+      function attachDrag(type) {
+        var src = panel.querySelector('[data-asset="' + type + '"] .wg-pl-glyph');
+        src.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          var ghost = el('div', 'wg-pl-ghost', glyph(type, st.colors[type], 48));
+          ghost.style.left = e.clientX + 'px';
+          ghost.style.top = e.clientY + 'px';
+          document.body.appendChild(ghost);
+          function overPrefab(ev) {
+            var r = prefabCard.getBoundingClientRect();
+            return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+          }
+          function move(ev) {
+            ghost.style.left = ev.clientX + 'px';
+            ghost.style.top = ev.clientY + 'px';
+            prefabCard.classList.toggle('over', overPrefab(ev));
+          }
+          function up(ev) {
+            document.removeEventListener('pointermove', move);
+            document.removeEventListener('pointerup', up);
+            document.removeEventListener('pointercancel', up);
+            ghost.remove();
+            prefabCard.classList.remove('over');
+            if (ev.type === 'pointerup' && overPrefab(ev)) {
+              st.prefab = type;
+              renderPrefab();
+              renderScene();
+            }
+          }
+          document.addEventListener('pointermove', move);
+          document.addEventListener('pointerup', up);
+          document.addEventListener('pointercancel', up);
+        });
+      }
+
+      renderAsset('cube');
+      renderAsset('house');
+      renderPrefab();
+      renderScene();
+      attachDrag('cube');
+      attachDrag('house');
+    },
+
+    /* rate lab: a gold square spinning on its central pivot and a red circle
+       orbiting it. Two sliders (-20..20) set the rates; a toggle switches the
+       units between degrees per second (honest, times dt) and degrees per
+       frame (the Turbo-button bug). Renders in three.js from a locally
+       vendored build; falls back to a 2D canvas if the library won't load. */
+    ratelab: function (mount) {
+      var RL = W.widgets.ratelab;
+      var st = { orbit: 10, spin: 10, perFrame: false };
+      var orbitAngle = 0, spinAngle = 0;   /* degrees */
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">The Rate Lab · a square, a circle, and two rates</div>'
+        + '<div class="wg-rl-view"><span class="wg-rl-badge"></span></div>'
+        + '<div class="wg-rl-ctl">'
+        +   '<div class="wg-rl-slider"><div class="lbl"><span>' + esc(RL.orbitLabel) + '</span><span class="val v-orbit"></span></div>'
+        +     '<input class="s-orbit" type="range" min="-20" max="20" step="1" value="' + st.orbit + '"></div>'
+        +   '<div class="wg-rl-slider"><div class="lbl"><span>' + esc(RL.spinLabel) + '</span><span class="val v-spin"></span></div>'
+        +     '<input class="s-spin" type="range" min="-20" max="20" step="1" value="' + st.spin + '"></div>'
+        + '</div>'
+        + '<div class="wg-rl-toggle">'
+        +   '<button class="wg-opt t-sec on">' + esc(RL.perSecondLabel) + '</button>'
+        +   '<button class="wg-opt t-frame">' + esc(RL.perFrameLabel) + '</button>'
+        +   '<span class="wg-rl-read"></span>'
+        + '</div>'
+        + '<div class="wg-rl-note honest"></div>'
+        + '<div style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:10px 0 8px;">' + esc(RL.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var view = panel.querySelector('.wg-rl-view');
+      var read = panel.querySelector('.wg-rl-read');
+      var note = panel.querySelector('.wg-rl-note');
+
+      function unit() { return st.perFrame ? '°/frame' : '°/s'; }
+      function labels() {
+        panel.querySelector('.v-orbit').textContent = st.orbit + ' ' + unit();
+        panel.querySelector('.v-spin').textContent = st.spin + ' ' + unit();
+        panel.querySelector('.t-sec').className = 'wg-opt t-sec' + (st.perFrame ? '' : ' on');
+        panel.querySelector('.t-frame').className = 'wg-opt t-frame' + (st.perFrame ? ' on' : '');
+        note.className = 'wg-rl-note ' + (st.perFrame ? 'bug' : 'honest');
+        note.textContent = st.perFrame ? RL.bugNote : RL.honestNote;
+      }
+      panel.querySelector('.s-orbit').addEventListener('input', function () { st.orbit = +this.value; labels(); });
+      panel.querySelector('.s-spin').addEventListener('input', function () { st.spin = +this.value; labels(); });
+      panel.querySelector('.t-sec').addEventListener('click', function () { st.perFrame = false; labels(); });
+      panel.querySelector('.t-frame').addEventListener('click', function () { st.perFrame = true; labels(); });
+      labels();
+
+      /* advance the two angles by one frame's worth of motion */
+      function step(dt) {
+        var k = st.perFrame ? 1 : dt;
+        spinAngle = (spinAngle + st.spin * k) % 360;
+        orbitAngle = (orbitAngle + st.orbit * k) % 360;
+      }
+      var emaFps = 0;
+      function readout(rawDt) {
+        if (rawDt > 0) emaFps = emaFps ? emaFps * 0.95 + (1 / rawDt) * 0.05 : 1 / rawDt;
+        read.textContent = Math.round(emaFps) + ' fps · dt ' + (rawDt * 1000).toFixed(1) + ' ms';
+      }
+
+      function init3D() {
+        panel.querySelector('.wg-rl-badge').textContent = 'three.js';
+        var wpx = view.clientWidth || 640, hpx = 320;
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(wpx, hpx);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        view.appendChild(renderer.domElement);
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0F0E0C);
+        var camera = new THREE.PerspectiveCamera(45, wpx / hpx, 0.1, 100);
+        camera.position.set(0, 4.6, 7.2);
+        camera.lookAt(0, 0, 0);
+        scene.add(new THREE.GridHelper(12, 12, 0x2E2A20, 0x1a1712));
+        var cube = new THREE.Mesh(
+          new THREE.BoxGeometry(1.6, 1.6, 1.6),
+          new THREE.MeshStandardMaterial({ color: 0xD8A24A, roughness: 0.55, metalness: 0.15 }));
+        cube.position.y = 0.8;
+        scene.add(cube);
+        var pivot = new THREE.Group();
+        pivot.position.y = 0.55;
+        scene.add(pivot);
+        var ball = new THREE.Mesh(
+          new THREE.SphereGeometry(0.55, 32, 16),
+          new THREE.MeshStandardMaterial({ color: 0xB11226, roughness: 0.45, metalness: 0.1 }));
+        ball.position.x = 3;
+        pivot.add(ball);
+        var ringPts = [];
+        for (var i = 0; i <= 64; i++) {
+          var a = i / 64 * Math.PI * 2;
+          ringPts.push(new THREE.Vector3(Math.cos(a) * 3, 0.02, Math.sin(a) * 3));
+        }
+        scene.add(new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(ringPts),
+          new THREE.LineBasicMaterial({ color: 0xB11226, transparent: true, opacity: 0.35 })));
+        var sun = new THREE.DirectionalLight(0xFFF6E8, 1.15);
+        sun.position.set(3, 6, 4);
+        scene.add(sun);
+        scene.add(new THREE.AmbientLight(0x8a8072, 0.55));
+        var D2R = Math.PI / 180, last = null;
+        function tick(ts) {
+          if (!mount.isConnected) { renderer.dispose(); return; }
+          var rawDt = last === null ? 0 : (ts - last) / 1000;
+          last = ts;
+          step(Math.min(rawDt, 0.05));
+          readout(rawDt);
+          cube.rotation.y = spinAngle * D2R;
+          pivot.rotation.y = orbitAngle * D2R;
+          renderer.render(scene, camera);
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function init2D() {
+        panel.querySelector('.wg-rl-badge').textContent = '2d fallback';
+        var wpx = view.clientWidth || 640, hpx = 320;
+        var cv = document.createElement('canvas');
+        cv.width = wpx; cv.height = hpx;
+        view.appendChild(cv);
+        var g = cv.getContext('2d');
+        var cx = wpx / 2, cy = hpx / 2, R = 110;
+        var last = null;
+        function tick(ts) {
+          if (!mount.isConnected) return;
+          var rawDt = last === null ? 0 : (ts - last) / 1000;
+          last = ts;
+          step(Math.min(rawDt, 0.05));
+          readout(rawDt);
+          g.fillStyle = '#0F0E0C'; g.fillRect(0, 0, wpx, hpx);
+          g.strokeStyle = '#1a1712'; g.lineWidth = 1;
+          for (var x = 0; x <= wpx; x += 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, hpx); g.stroke(); }
+          for (var y = 0; y <= hpx; y += 24) { g.beginPath(); g.moveTo(0, y); g.lineTo(wpx, y); g.stroke(); }
+          g.strokeStyle = 'rgba(177,18,38,.35)'; g.lineWidth = 1.5;
+          g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.stroke();
+          g.save();
+          g.translate(cx, cy);
+          g.rotate(spinAngle * Math.PI / 180);
+          g.fillStyle = '#D8A24A';
+          g.fillRect(-32, -32, 64, 64);
+          g.restore();
+          var oa = orbitAngle * Math.PI / 180;
+          g.fillStyle = '#B11226';
+          g.beginPath(); g.arc(cx + Math.cos(oa) * R, cy + Math.sin(oa) * R, 16, 0, Math.PI * 2); g.fill();
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      /* three.js from the locally vendored build, by dynamic injection;
+         a static tag would be inert in D2L and a CDN could be blocked */
+      if (window.THREE) init3D();
+      else {
+        var s = document.createElement('script');
+        s.src = (window.SE266_WIKI_BASE || BASE) + 'vendor/three.min.js';
+        s.onload = function () { if (window.THREE) init3D(); else init2D(); };
+        s.onerror = function () { init2D(); };
+        document.head.appendChild(s);
+      }
+    },
+
+    /* side-scroller: a minimalist platformer that exists to make the input HUD
+       tangible. Movement (A/D) polls held state, GetKey style: fires every frame
+       the key is down. Jump (W) and attack (Space) poll edges, GetKeyDown style:
+       fire once per press. The HUD counters make the difference visible: the
+       held counter races while you hold; the edge counters tick once per press.
+       Auto-repeat is filtered so a held key is one edge, which is exactly how a
+       real engine defines GetKeyDown (and how the Three.js note hand-builds it). */
+    sidescroller: function (mount) {
+      var SS = W.widgets.sidescroller;
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">The Side-Scroller · one input, two functions</div>'
+        + '<div class="wg-ss2-view"><div class="wg-ss2-focus"><span>' + esc(SS.focusHint) + '</span></div></div>'
+        + '<div class="wg-ss2-hud">'
+        +   '<div class="wg-ss2-flag key f-move"><div class="fn">' + esc(SS.getKey) + '</div>'
+        +     '<div class="ctl">' + esc(SS.moveLabel) + '</div><div class="cnt c-move">0</div>'
+        +     '<div class="tag">' + esc(SS.heldTag) + '</div></div>'
+        +   '<div class="wg-ss2-flag edge f-jump"><div class="fn">' + esc(SS.getKeyDown) + '</div>'
+        +     '<div class="ctl">' + esc(SS.jumpLabel) + '</div><div class="cnt c-jump">0</div>'
+        +     '<div class="tag">' + esc(SS.edgeTag) + '</div></div>'
+        +   '<div class="wg-ss2-flag edge f-attack"><div class="fn">' + esc(SS.getKeyDown) + '</div>'
+        +     '<div class="ctl">' + esc(SS.attackLabel) + '</div><div class="cnt c-attack">0</div>'
+        +     '<div class="tag">' + esc(SS.edgeTag) + '</div></div>'
+        + '</div>'
+        + '<div class="wg-ss2-legend">'
+        +   '<span><span class="sw" style="background:#D8A24A"></span>crate: attack to destroy</span>'
+        +   '<span><span class="sw" style="background:#6b6660"></span>stone: jump over it</span>'
+        +   '<span><span class="sw" style="background:#B11226"></span>your attack</span>'
+        + '</div>'
+        + '<div style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:10px 0 8px;">' + esc(SS.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var view = panel.querySelector('.wg-ss2-view');
+      var focusEl = panel.querySelector('.wg-ss2-focus');
+      var cMove = panel.querySelector('.c-move'), cJump = panel.querySelector('.c-jump'), cAttack = panel.querySelector('.c-attack');
+      var fMove = panel.querySelector('.f-move'), fJump = panel.querySelector('.f-jump'), fAttack = panel.querySelector('.f-attack');
+
+      var Wd = view.clientWidth || 640, Hd = 300;
+      var cv = document.createElement('canvas');
+      cv.width = Wd; cv.height = Hd; cv.tabIndex = 0;
+      view.insertBefore(cv, focusEl);
+      var g = cv.getContext('2d');
+
+      var GROUND = Hd - 40, BOUND = Wd / 3;
+      var GRAV = 1500, JUMPV = 590, MOVE = 220, BALLV = 400;
+
+      var held = {}, edge = {};
+      var counts = { move: 0, jump: 0, attack: 0 };
+      var flash = { jump: 0, attack: 0 };   /* ms timestamps for HUD blip */
+      var active = false;
+
+      var player = { x: 70, y: 0, vy: 0, grounded: true, face: 1, walk: 0, atk: 0, cd: 0 };
+      var camera = 0;
+      var obstacles = [], balls = [], nextX = 420, destroyed = 0;
+
+      function spawn(x) {
+        var destructible = Math.random() < 0.55;
+        obstacles.push({ x: x, w: destructible ? 30 : 34, h: destructible ? 30 : 40,
+                         destructible: destructible, alive: true });
+      }
+      spawn(nextX); nextX += 240; spawn(nextX); nextX += 260;
+
+      function norm(e) {
+        var k = e.key.toLowerCase();
+        if (k === 'w' || k === 'a' || k === 's' || k === 'd' || k === ' ' || k === 'spacebar') return k === 'spacebar' ? ' ' : k;
+        return null;
+      }
+      cv.addEventListener('keydown', function (e) {
+        var k = norm(e); if (!k) return;
+        e.preventDefault();
+        if (!held[k]) { held[k] = true; edge[k] = true; }   /* auto-repeat: held already true, no new edge */
+      });
+      cv.addEventListener('keyup', function (e) {
+        var k = norm(e); if (!k) return;
+        e.preventDefault(); held[k] = false;
+      });
+      function activate() { active = true; focusEl.classList.add('hide'); cv.focus(); }
+      focusEl.addEventListener('click', activate);
+      cv.addEventListener('pointerdown', activate);
+      cv.addEventListener('blur', function () { active = false; held = {}; focusEl.classList.remove('hide'); });
+
+      function rectHit(ax, aw, bx, bw) { return ax < bx + bw && ax + aw > bx; }
+
+      function update(dt, ts) {
+        /* movement: GetKey, continuous */
+        var dir = 0;
+        if (held['a']) dir -= 1;
+        if (held['d']) dir += 1;
+        if (dir !== 0) { player.face = dir; counts.move++; }
+        player.x += dir * MOVE * dt;
+
+        camera = Math.max(camera, player.x - BOUND);
+        if (player.x < camera + 6) player.x = camera + 6;   /* cannot leave the left edge */
+
+        /* jump: GetKeyDown, edge */
+        if (edge['w'] && player.grounded) { player.vy = JUMPV; player.grounded = false; counts.jump++; flash.jump = ts; }
+        /* attack: GetKeyDown, edge */
+        if (edge[' '] && player.cd <= 0) {
+          balls.push({ x: player.x + 14, y: GROUND - 26 - player.y, r: 6 });
+          player.cd = 0.32; player.atk = 0.22; counts.attack++; flash.attack = ts;
+        }
+        edge = {};   /* edges live one frame */
+
+        /* gravity */
+        player.vy -= GRAV * dt;
+        player.y += player.vy * dt;
+        if (player.y <= 0) { player.y = 0; player.vy = 0; player.grounded = true; }
+        player.cd -= dt; player.atk -= dt;
+        if (dir !== 0 && player.grounded) player.walk += dt * 9; else player.walk = 0;
+
+        /* horizontal block: cannot walk through a standing obstacle */
+        var pw = 22;
+        obstacles.forEach(function (o) {
+          if (!o.alive) return;
+          if (rectHit(player.x - pw / 2, pw, o.x, o.w) && player.y < o.h - 2) {
+            if (player.x < o.x) player.x = o.x - pw / 2;   /* approaching from the left */
+          }
+        });
+
+        /* balls */
+        balls.forEach(function (b) { b.x += BALLV * dt; });
+        balls = balls.filter(function (b) {
+          if (b.x > camera + Wd + 40) return false;
+          var kill = true;
+          for (var i = 0; i < obstacles.length; i++) {
+            var o = obstacles[i];
+            if (o.alive && rectHit(b.x - b.r, b.r * 2, o.x, o.w) && (GROUND - b.y) < o.h + 6) {
+              if (o.destructible) { o.alive = false; destroyed++; }
+              return false;   /* stone absorbs the ball too */
+            }
+          }
+          return kill;
+        });
+
+        /* spawn ahead, cull behind */
+        while (nextX < camera + Wd + 300) { spawn(nextX); nextX += 200 + Math.random() * 150; }
+        obstacles = obstacles.filter(function (o) { return o.x + o.w > camera - 60; });
+      }
+
+      function stick(cx, feetY) {
+        var hipY = feetY - 20, shY = feetY - 38, headY = feetY - 45;
+        g.strokeStyle = '#ECE5D8'; g.lineWidth = 2.4; g.lineCap = 'round';
+        g.fillStyle = '#241F18';
+        g.beginPath(); g.arc(cx, headY, 6, 0, Math.PI * 2); g.fill(); g.stroke();
+        g.beginPath(); g.moveTo(cx, headY + 6); g.lineTo(cx, hipY); g.stroke();
+        /* legs */
+        g.beginPath();
+        if (!player.grounded) { g.moveTo(cx, hipY); g.lineTo(cx - 7, feetY - 7); g.moveTo(cx, hipY); g.lineTo(cx + 9, feetY - 9); }
+        else {
+          var sw = Math.sin(player.walk) * 9;
+          g.moveTo(cx, hipY); g.lineTo(cx + sw, feetY);
+          g.moveTo(cx, hipY); g.lineTo(cx - sw, feetY);
+        }
+        g.stroke();
+        /* arms */
+        g.beginPath();
+        if (player.atk > 0) {
+          g.moveTo(cx, shY + 3); g.lineTo(cx + player.face * 16, shY + 1);   /* thrust */
+          g.moveTo(cx, shY + 3); g.lineTo(cx - player.face * 8, shY + 13);
+        } else if (!player.grounded) {
+          g.moveTo(cx, shY + 3); g.lineTo(cx - 9, shY - 6); g.moveTo(cx, shY + 3); g.lineTo(cx + 9, shY - 6);
+        } else {
+          var asw = Math.sin(player.walk) * 7;
+          g.moveTo(cx, shY + 3); g.lineTo(cx - asw, shY + 15);
+          g.moveTo(cx, shY + 3); g.lineTo(cx + asw, shY + 15);
+        }
+        g.stroke();
+      }
+
+      function draw() {
+        g.fillStyle = '#0F0E0C'; g.fillRect(0, 0, Wd, Hd);
+        /* parallax dots */
+        g.fillStyle = '#1a1712';
+        for (var i = 0; i < 40; i++) {
+          var sx = ((i * 137 - camera * 0.3) % (Wd + 20) + Wd + 20) % (Wd + 20) - 10;
+          g.fillRect(sx, 30 + (i * 53) % (GROUND - 60), 2, 2);
+        }
+        /* ground */
+        g.strokeStyle = '#2E2A20'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(0, GROUND); g.lineTo(Wd, GROUND); g.stroke();
+        g.fillStyle = '#141210'; g.fillRect(0, GROUND, Wd, Hd - GROUND);
+        /* boundary hint */
+        g.strokeStyle = 'rgba(216,162,74,.14)'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(BOUND, 0); g.lineTo(BOUND, GROUND); g.stroke();
+        /* obstacles */
+        obstacles.forEach(function (o) {
+          if (!o.alive) return;
+          var sx = o.x - camera, sy = GROUND - o.h;
+          if (o.destructible) {
+            g.fillStyle = '#D8A24A'; g.fillRect(sx, sy, o.w, o.h);
+            g.strokeStyle = '#8a6a2f'; g.lineWidth = 1.5; g.strokeRect(sx + 0.5, sy + 0.5, o.w - 1, o.h - 1);
+            g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + o.w, sy + o.h); g.moveTo(sx + o.w, sy); g.lineTo(sx, sy + o.h); g.stroke();
+          } else {
+            g.fillStyle = '#6b6660'; g.fillRect(sx, sy, o.w, o.h);
+            g.strokeStyle = '#3a3630'; g.lineWidth = 1.5; g.strokeRect(sx + 0.5, sy + 0.5, o.w - 1, o.h - 1);
+          }
+        });
+        /* balls */
+        g.fillStyle = '#B11226';
+        balls.forEach(function (b) { g.beginPath(); g.arc(b.x - camera, b.y, b.r, 0, Math.PI * 2); g.fill(); });
+        /* player */
+        stick(player.x - camera, GROUND - player.y);
+        /* score */
+        g.fillStyle = '#8A8072'; g.font = '11px monospace'; g.textAlign = 'left';
+        g.fillText('destroyed: ' + destroyed, 10, 18);
+      }
+
+      function hud(ts) {
+        var moving = !!(held['a'] || held['d']);
+        fMove.classList.toggle('lit', moving && active);
+        fJump.classList.toggle('lit', ts - flash.jump < 170);
+        fAttack.classList.toggle('lit', ts - flash.attack < 170);
+        cMove.textContent = counts.move;
+        cJump.textContent = counts.jump;
+        cAttack.textContent = counts.attack;
+      }
+
+      var last = null;
+      function loop(ts) {
+        if (!mount.isConnected) return;
+        var dt = last === null ? 0 : Math.min((ts - last) / 1000, 0.05);
+        last = ts;
+        if (active) update(dt, ts);
+        draw();
+        hud(ts);
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    },
+
+    quiz: function (mount) {
+      var Q = W.widgets.quiz;
+      var best = lsGet('quizBest', null);
+      function paint() {
+        var qz = quizState;
+        mount.innerHTML = '';
+        var dlg = el('div', 'wg-dlg');
+        if (qz.done) {
+          var lineTxt = qz.score === Q.length ? 'Flawless. The anatomy is yours.'
+            : qz.score >= Q.length - 2 ? 'Solid. Skim the articles for the ones you missed.'
+            : 'Worth a re-read before Assignment 1 lands next week.';
+          dlg.innerHTML = '<div class="wg-dlg-who">Quest Complete</div>'
+            + '<div style="text-align:center; padding:16px 0 4px;">'
+            + '<div class="wg-score-big">' + qz.score + ' / ' + Q.length + '</div>'
+            + '<div class="wg-score-sub">' + esc(lineTxt)
+            + (best !== null ? ' · personal best ' + best + '/' + Q.length : '') + '</div></div>'
+            + '<div class="wg-dlg-foot"><span class="wg-dlg-num">run complete</span></div>';
+          var retry = el('button', 'wg-btn', 'Run It Again');
+          retry.addEventListener('click', function () {
+            quizState = { idx: 0, picked: null, score: 0, done: false }; paint();
+          });
+          dlg.lastChild.appendChild(retry);
+        } else {
+          var item = Q[qz.idx];
+          dlg.innerHTML = '<div class="wg-dlg-who">Question</div>'
+            + '<p class="wg-dlg-q">' + esc(item.q) + '</p>';
+          var wrap = el('div', 'wg-answers');
+          item.options.forEach(function (opt, oi) {
+            var cls = 'wg-ans';
+            if (qz.picked !== null) {
+              if (oi === item.correct) cls += ' right';
+              else if (oi === qz.picked) cls += ' wrong';
+            }
+            var b = el('button', cls, esc(opt));
+            b.disabled = qz.picked !== null;
+            b.addEventListener('click', function () {
+              if (qz.picked !== null) return;
+              qz.picked = oi;
+              if (oi === item.correct) qz.score++;
+              paint();
+            });
+            wrap.appendChild(b);
+          });
+          dlg.appendChild(wrap);
+          if (qz.picked !== null) dlg.appendChild(el('div', 'wg-explain', esc(item.explain)));
+          var foot = el('div', 'wg-dlg-foot');
+          foot.appendChild(el('span', 'wg-dlg-num', (qz.idx + 1) + ' / ' + Q.length + ' · score ' + qz.score));
+          var next = el('button', 'wg-btn', qz.idx + 1 === Q.length ? 'Finish' : 'Next');
+          next.disabled = qz.picked === null;
+          next.addEventListener('click', function () {
+            if (qz.idx + 1 === Q.length) {
+              qz.done = true;
+              if (best === null || qz.score > best) { best = qz.score; lsSet('quizBest', best); }
+            } else { qz.idx++; qz.picked = null; }
+            paint();
+          });
+          foot.appendChild(next);
+          dlg.appendChild(foot);
+        }
+        mount.appendChild(dlg);
+      }
+      paint();
+    },
+
+    checklist: function (mount) {
+      var C = W.widgets.checklist;
+      var checks = lsGet('checks', {});
+      function paint() {
+        mount.innerHTML = '';
+        var req = C.items.filter(function (c) { return !c.optional; });
+        var done = req.filter(function (c) { return checks[c.id]; }).length;
+        var head = el('div', '', '<span class="wg-label">The Finish Line · ' + done + '/' + req.length + ' required</span>');
+        mount.appendChild(head);
+        var track = el('div', 'wg-track');
+        track.appendChild(el('div', 'wg-fill'));
+        track.firstChild.style.width = Math.round(done / req.length * 100) + '%';
+        mount.appendChild(track);
+        var list = el('div', 'wg-panel');
+        C.items.forEach(function (c) {
+          var row = el('div', 'wg-check' + (checks[c.id] ? ' done' : ''));
+          row.innerHTML = '<span class="wg-box">' + (checks[c.id] ? '✓' : '') + '</span>'
+            + '<span class="ctext">' + esc(c.label)
+            + (c.optional ? '<span class="wg-opt-tag">optional</span>' : '') + '</span>';
+          row.addEventListener('click', function () {
+            checks[c.id] = !checks[c.id]; lsSet('checks', checks); paint();
+          });
+          list.appendChild(row);
+        });
+        mount.appendChild(list);
+        mount.appendChild(el('div', 'wg-note', esc(C.note)));
+        if (done === req.length) {
+          mount.appendChild(el('div', 'wg-done-line',
+            '✓ All four boxes. You are officially not doing Week 1 late. See you at the Standard Prefab.'));
+        }
+      }
+      paint();
+    }
+  };
+
+  /* ================= sidebar ================= */
+  function renderSide(current, filter) {
+    var side = document.getElementById('wk-side');
+    side.innerHTML = '';
+    var total = 0;
+    W.sections.forEach(function (sec) {
+      var matches = sec.articles.filter(function (a) {
+        return !filter || a.title.toLowerCase().indexOf(filter) >= 0;
+      });
+      if (!matches.length) return;
+      side.appendChild(el('div', 'wk-sect', esc(sec.name)));
+      matches.forEach(function (a) {
+        total++;
+        var link = el('a', 'wk-link'
+          + (a.id === current ? ' on' : '')
+          + (visited.indexOf(a.id) >= 0 ? ' seen' : ''));
+        link.href = '#/' + a.id;
+        link.innerHTML = esc(a.title) + '<span class="v">✓</span>';
+        side.appendChild(link);
+      });
+    });
+    if (!filter) {
+      var prog = el('div', 'wk-progress');
+      var pct = Math.round(visited.length / flat.length * 100);
+      prog.innerHTML = 'read ' + visited.length + ' / ' + flat.length + ' articles'
+        + '<div class="bar"><div class="fill" style="width:' + pct + '%;"></div></div>';
+      side.appendChild(prog);
+    } else if (!total) {
+      side.appendChild(el('div', 'wk-progress', 'no articles match'));
+    }
+  }
+
+  /* ================= article loading ================= */
+  function loadArticle(id) {
+    if (!titles[id]) id = W.home;
+    var main = document.getElementById('wk-main');
+
+    function show(md) {
+      main.innerHTML = '';
+      var art = el('article', 'wk-art');
+      art.innerHTML = markdown(md);
+      main.appendChild(art);
+
+      /* mount widgets */
+      var mounts = art.querySelectorAll('[data-widget]');
+      for (var m = 0; m < mounts.length; m++) {
+        var name = mounts[m].getAttribute('data-widget');
+        if (widgets[name]) widgets[name](mounts[m]);
+        else mounts[m].innerHTML = '<div class="wg-hint">unknown widget: ' + esc(name) + '</div>';
+      }
+
+      /* prev / next */
+      var idx = -1;
+      flat.forEach(function (a, k) { if (a.id === id) idx = k; });
+      var nav = el('div', 'wk-footnav');
+      if (idx > 0) {
+        var prev = el('a', 'wk-fbtn', '← ' + esc(flat[idx - 1].title));
+        prev.href = '#/' + flat[idx - 1].id;
+        nav.appendChild(prev);
+      }
+      if (idx >= 0 && idx < flat.length - 1) {
+        var nxt = el('a', 'wk-fbtn next', esc(flat[idx + 1].title) + ' →');
+        nxt.href = '#/' + flat[idx + 1].id;
+        nav.appendChild(nxt);
+      }
+      main.appendChild(nav);
+      main.scrollTop = 0;
+
+      if (visited.indexOf(id) < 0) { visited.push(id); lsSet('visited', visited); }
+      lsSet('last', id);
+      renderSide(id, currentFilter());
+    }
+
+    if (cache[id]) { show(cache[id]); return; }
+    fetch(BASE + 'articles/' + id + '.md')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (md) { cache[id] = md; show(md); })
+      .catch(function () {
+        main.innerHTML = '<div class="wk-error">Couldn\'t load “' + esc(id) + '”.<br>'
+          + 'If you are the instructor: confirm <code>' + esc('w04/articles/' + id)
+          + '.md</code> was uploaded beside this file.</div>';
+        renderSide(id, currentFilter());
+      });
+  }
+
+  function currentFilter() {
+    var inp = document.getElementById('wk-search');
+    return inp ? inp.value.trim().toLowerCase() : '';
+  }
+  function route() {
+    var h = location.hash.replace(/^#\/?/, '');
+    loadArticle(h || lsGet('last', W.home));
+  }
+
+  /* ================= init ================= */
+  window.SE266_WIKI_INIT = function (data) {
+    if (!data) {
+      document.getElementById('wk-main').innerHTML =
+        '<div class="wk-error">Could not load w04/wiki-data.js.<br>Confirm the w04 folder was uploaded beside this file.</div>';
+      return;
+    }
+    W = data;
+    NS = 'se266wiki:' + W.weekId + ':';
+    visited = lsGet('visited', []);
+    titles = {};
+    flat = [];
+    W.sections.forEach(function (sec) {
+      sec.articles.forEach(function (a) { titles[a.id] = a.title; flat.push(a); });
+    });
+    document.getElementById('wk-kicker').textContent = W.courseTitle + ' · Course Wiki';
+    document.getElementById('wk-title').textContent = W.weekTitle;
+    document.getElementById('wk-search').addEventListener('input', function () {
+      renderSide(location.hash.replace(/^#\/?/, '') || W.home, currentFilter());
+    });
+    window.addEventListener('hashchange', route);
+    route();
+    window.SE266_WIKI_READY = true;   /* deploy-verification global */
+  };
+
+  /* Fonts: attempt the design system's faces; if the CDN is blocked the
+     stacks in :root degrade gracefully. Non-blocking. */
+  try {
+    var f = document.createElement('link');
+    f.rel = 'stylesheet';
+    f.href = 'https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Archivo:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap';
+    document.head.appendChild(f);
+  } catch (e) {}
+})();
+
+/* Data bootstrap: dynamic injection, because a static <script src>
+   does not execute inside a D2L content topic. */
+(function (done) {
+  var s = document.createElement('script');
+  s.src = (window.SE266_WIKI_BASE || '') + 'wiki-data.js';
+  s.onload  = function () { done(window.SE266_WIKI || null); };
+  s.onerror = function () { console.warn('wiki-data.js failed to load'); done(null); };
+  document.head.appendChild(s);
+})(window.SE266_WIKI_INIT);
+</script>
+</body>
+</html>
