@@ -235,6 +235,39 @@
   .wg-note { font-size: 12px; line-height: 1.6; color: var(--dim); margin-top: 12px; }
   .wg-done-line { margin-top: 8px; font-family: var(--mono); font-size: 12px; color: var(--green); }
 
+  /* solar system (supplemental) */
+  .wg-ss-row { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 12px; }
+  .wg-ss-insp { flex: none; width: 214px; background: var(--panel); border: 1px solid var(--panel-border);
+                border-radius: 10px; padding: 12px 14px; }
+  .wg-ss-h { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+             color: var(--gold); margin: 12px 0 6px; }
+  .wg-ss-h:first-child { margin-top: 0; }
+  .wg-ss-node { display: block; width: 100%; text-align: left; cursor: pointer; background: none; border: none;
+                border-radius: 6px; padding: 4px 8px; font-family: var(--mono); font-size: 12px; color: var(--body); }
+  .wg-ss-node:hover { background: #231F19; color: var(--ink); }
+  .wg-ss-node.sel { background: var(--red-wash); color: var(--cream); outline: 1px solid var(--red); }
+  .wg-ss-node .k { color: var(--faint); font-size: 10px; margin-left: 6px; }
+  .wg-ss-selname { font-family: var(--disp); font-weight: 800; font-size: 14px; color: var(--cream); }
+  .wg-ss-selkind { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+                   color: var(--pink); margin-left: 7px; }
+  .wg-ss-tr { font-family: var(--mono); font-size: 11.5px; color: var(--ink); line-height: 1.9; }
+  .wg-ss-tr b { color: var(--dim); font-weight: 400; display: inline-block; width: 62px; }
+  .wg-ss-note { font-family: var(--sans); font-size: 11.5px; color: var(--dim); line-height: 1.55; margin-top: 10px; }
+  .wg-ss-view { flex: 1; min-width: 300px; border: 1px solid var(--panel-border); border-radius: 10px;
+                background-color: #0F0E0C; display: block;
+                background-image: linear-gradient(#1a1712 1px, transparent 1px),
+                                  linear-gradient(90deg, #1a1712 1px, transparent 1px);
+                background-size: 24px 24px; }
+  .wg-ss-arm { stroke: #B11226; stroke-width: 1.5; stroke-dasharray: 5 4; opacity: .65; pointer-events: none; }
+  .wg-ss-body { cursor: pointer; }
+  .wg-ss-body.sel { stroke: #FAF7F2 !important; stroke-width: 2.5; }
+  .wg-ss-pivot { cursor: pointer; }
+  .wg-ss-pivot line { stroke: #F0B8C0; stroke-width: 2; }
+  .wg-ss-pivot .dot { fill: #B11226; }
+  .wg-ss-pivot .hit { fill: transparent; }
+  .wg-ss-pivot.sel line { stroke: #FAF7F2; }
+  .wg-ss-pivot.sel .dot { fill: #FAF7F2; }
+
   .wk-error { padding: 48px 20px; text-align: center; font-family: var(--mono); font-size: 13px;
               color: var(--pink); line-height: 1.8; }
 
@@ -505,6 +538,122 @@
         blades.setAttribute('transform', 'translate(' + HUBX + ',' + HUBY + ')');
         requestAnimationFrame(tick);
       }
+      requestAnimationFrame(tick);
+    },
+
+    /* solar system: sun at center, earth orbits sun, moon orbits earth,
+       animated purely by rotating two pivot empties. Select bodies or
+       pivots in the scene or the hierarchy; a mini-inspector shows the
+       local transform (frozen) and the world position (sweeping). */
+    solarsystem: function (mount) {
+      var SS = W.widgets.solarsystem;
+      var EARTH_ARM = 130, MOON_ARM = 48;
+      var st = { a: 0, b: 0, sel: 'earth' };
+      var byId = {};
+      SS.nodes.forEach(function (n) { byId[n.id] = n; });
+      var LOCAL = { sun: [0,0,0], earthpivot: [0,0,0], earth: [EARTH_ARM,0,0], moonpivot: [0,0,0], moon: [MOON_ARM,0,0] };
+
+      function crosshair(id) {
+        return '<g class="wg-ss-pivot" data-node="' + id + '">'
+          + '<line x1="-7" y1="0" x2="7" y2="0"/><line x1="0" y1="-7" x2="0" y2="7"/>'
+          + '<circle class="dot" r="2.5"/><circle class="hit" r="12"/></g>';
+      }
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">The Solar System · two spinning empties</div>'
+        + '<div class="wg-ss-row">'
+        + '<div class="wg-ss-insp">'
+        +   '<div class="wg-ss-h">Hierarchy</div><div class="wg-ss-tree"></div>'
+        +   '<div class="wg-ss-h">Inspector</div>'
+        +   '<div><span class="wg-ss-selname"></span><span class="wg-ss-selkind"></span></div>'
+        +   '<div class="wg-ss-tr" style="margin-top:6px;">'
+        +     '<div><b>Position</b><span class="v-pos"></span></div>'
+        +     '<div><b>Rotation</b><span class="v-rot"></span></div>'
+        +     '<div><b>Scale</b><span class="v-scl">(1, 1, 1)</span></div>'
+        +     '<div><b>World</b><span class="v-wld"></span></div>'
+        +   '</div>'
+        +   '<div class="wg-ss-note"></div>'
+        + '</div>'
+        + '<svg class="wg-ss-view" viewBox="0 0 470 430">'
+        +   '<g transform="translate(235,215)">'
+        +     '<circle r="48" fill="#D8A24A" opacity=".14"/>'
+        +     '<circle class="wg-ss-body" data-node="sun" r="40" fill="#D8A24A" stroke="#8a6a2f" stroke-width="1.5"/>'
+        +     '<g class="ss-apiv">'
+        +       '<line class="wg-ss-arm" x1="0" y1="0" x2="' + EARTH_ARM + '" y2="0"/>'
+        +       crosshair('earthpivot')
+        +       '<g transform="translate(' + EARTH_ARM + ',0)">'
+        +         '<circle class="wg-ss-body" data-node="earth" r="16" fill="#2E4A6B" stroke="#4a6f96" stroke-width="1.5"/>'
+        +         '<g class="ss-bpiv">'
+        +           '<line class="wg-ss-arm" x1="0" y1="0" x2="' + MOON_ARM + '" y2="0"/>'
+        +           crosshair('moonpivot')
+        +           '<g transform="translate(' + MOON_ARM + ',0)">'
+        +             '<circle class="wg-ss-body" data-node="moon" r="7" fill="#9D9284" stroke="#C9C0B2" stroke-width="1.2"/>'
+        +           '</g>'
+        +         '</g>'
+        +       '</g>'
+        +     '</g>'
+        +   '</g>'
+        + '</svg>'
+        + '</div>'
+        + '<div class="wg-rp-note" style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:8px 0;">' + esc(SS.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var tree = panel.querySelector('.wg-ss-tree');
+      SS.nodes.forEach(function (n) {
+        var b = el('button', 'wg-ss-node' + (st.sel === n.id ? ' sel' : ''));
+        b.style.paddingLeft = (8 + n.depth * 13) + 'px';
+        b.setAttribute('data-node', n.id);
+        b.innerHTML = esc(n.name) + (n.kind === 'pivot' ? '<span class="k">pivot</span>' : '');
+        tree.appendChild(b);
+      });
+
+      function fmt(v) { return '(' + v.map(function (x) { return Math.round(x); }).join(', ') + ')'; }
+      function select(id) {
+        st.sel = id;
+        panel.querySelectorAll('.wg-ss-node').forEach(function (r) {
+          r.className = 'wg-ss-node' + (r.getAttribute('data-node') === id ? ' sel' : '');
+        });
+        panel.querySelectorAll('[data-node].wg-ss-body, [data-node].wg-ss-pivot').forEach(function (s) {
+          s.classList.toggle('sel', s.getAttribute('data-node') === id);
+        });
+        var n = byId[id];
+        panel.querySelector('.wg-ss-selname').textContent = n.name;
+        panel.querySelector('.wg-ss-selkind').textContent = n.kind;
+        panel.querySelector('.v-pos').textContent = fmt(LOCAL[id]);
+        panel.querySelector('.wg-ss-note').textContent = n.note;
+        live();
+      }
+      function live() {
+        var rot = st.sel === 'earthpivot' ? st.a : st.sel === 'moonpivot' ? st.b : 0;
+        panel.querySelector('.v-rot').textContent = '(0, 0, ' + Math.round(((rot % 360) + 360) % 360) + '°)';
+        var ra = st.a * Math.PI / 180, rb = (st.a + st.b) * Math.PI / 180;
+        var ew = [EARTH_ARM * Math.cos(ra), EARTH_ARM * Math.sin(ra)];
+        var mw = [ew[0] + MOON_ARM * Math.cos(rb), ew[1] + MOON_ARM * Math.sin(rb)];
+        var world = { sun: [0,0], earthpivot: [0,0], earth: ew, moonpivot: ew, moon: mw }[st.sel];
+        panel.querySelector('.v-wld').textContent = '(' + Math.round(world[0]) + ', ' + Math.round(world[1]) + ', 0)';
+      }
+      panel.querySelectorAll('[data-node]').forEach(function (s) {
+        s.addEventListener('click', function () { select(s.getAttribute('data-node')); });
+      });
+
+      var apiv = panel.querySelector('.ss-apiv'), bpiv = panel.querySelector('.ss-bpiv');
+      var last = null;
+      function tick(ts) {
+        if (!mount.isConnected) return;
+        if (last !== null) {
+          var dt = Math.min((ts - last) / 1000, 0.05);   /* clamp: no teleporting after a throttled tab */
+          st.a = (st.a + 18 * dt) % 360;
+          st.b = (st.b + 66 * dt) % 360;
+        }
+        last = ts;
+        apiv.setAttribute('transform', 'rotate(' + st.a + ')');
+        bpiv.setAttribute('transform', 'rotate(' + st.b + ')');
+        live();
+        requestAnimationFrame(tick);
+      }
+      select(st.sel);
       requestAnimationFrame(tick);
     },
 

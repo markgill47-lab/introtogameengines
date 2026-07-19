@@ -32,6 +32,9 @@ window.SE266_WIKI = {
       { id: "standard-prefab", title: "The Standard Prefab" },
       { id: "cross-engine-dictionary", title: "Cross-Engine Dictionary" }
     ]},
+    { name: "Supplemental", articles: [
+      { id: "solar-system", title: "The Solar System" }
+    ]},
     { name: "Practice", articles: [
       { id: "hierarchy-basics", title: "Exercise 1: Hierarchy Basics" },
       { id: "the-house", title: "Exercise 2: The House" },
@@ -53,6 +56,23 @@ window.SE266_WIKI = {
     /* transformlab and pivotdemo are self-contained in the shell */
     transformlab: {},
     pivotdemo: {},
+
+    /* solar system: two spinning empties animate the whole sky */
+    solarsystem: {
+      instruction: "Select a body or a pivot, in the scene or in the hierarchy.",
+      nodes: [
+        { id: "sun", name: "Sun", kind: "body", depth: 0,
+          note: "The anchor. Position (0, 0, 0), rotation 0, forever. Everything else in the sky is, eventually, its child." },
+        { id: "earthpivot", name: "EarthPivot", kind: "pivot", depth: 1,
+          note: "An empty at the center of the Sun. No visuals, one job, and the only animated number in the Earth's entire orbit: this rotation. The windmill fix, celestially scaled." },
+        { id: "earth", name: "Earth", kind: "body", depth: 2,
+          note: "Watch the inspector: local position frozen at (130, 0, 0) relative to EarthPivot while the world position sweeps a circle. Nobody moves the Earth. Attachment does the math." },
+        { id: "moonpivot", name: "MoonPivot", kind: "pivot", depth: 3,
+          note: "An empty at the center of the Earth, riding everything the Earth rides. Its rotation is the Moon's entire orbit." },
+        { id: "moon", name: "Moon", kind: "body", depth: 4,
+          note: "Local position (48, 0, 0), forever. Riding the MoonPivot, which rides the Earth, which rides the EarthPivot. Snack rides cart, cart rides plane." }
+      ]
+    },
 
     quiz: [
       { q: "The cart rolls thirty feet down the aisle while the plane crosses a state line. What happens to the pretzels' numbers?",
