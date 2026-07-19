@@ -268,6 +268,34 @@
   .wg-ss-pivot.sel line { stroke: #FAF7F2; }
   .wg-ss-pivot.sel .dot { fill: #FAF7F2; }
 
+  /* prefab lab (supplemental) */
+  .wg-pl-head { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+                color: var(--gold); margin: 12px 0 6px; }
+  .wg-pl-scene { border: 1px solid var(--panel-border); border-radius: 10px; background-color: #0F0E0C;
+                 background-image: linear-gradient(#1a1712 1px, transparent 1px),
+                                   linear-gradient(90deg, #1a1712 1px, transparent 1px);
+                 background-size: 24px 24px; display: flex; justify-content: space-around; align-items: flex-end;
+                 padding: 18px 10px 10px; min-height: 132px; }
+  .wg-pl-inst { text-align: center; }
+  .wg-pl-inst .nm { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 3px; }
+  .wg-pl-assets { display: flex; gap: 12px; margin-top: 4px; align-items: stretch; justify-content: center;
+                  flex-wrap: wrap; }
+  .wg-pl-card { background: var(--card); border: 1px solid var(--chip-border); border-radius: 12px;
+                padding: 10px 12px 12px; width: 138px; text-align: center;
+                -webkit-user-select: none; user-select: none; }
+  .wg-pl-card .ttl { font-family: var(--mono); font-size: 11px; color: var(--ink); }
+  .wg-pl-card .tag { font-family: var(--mono); font-size: 9.5px; color: var(--faint); margin-top: 4px; }
+  .wg-pl-glyph { cursor: grab; touch-action: none; display: flex; justify-content: center; padding: 4px 0 2px; }
+  .wg-pl-glyph:active { cursor: grabbing; }
+  .wg-pl-prefab { border: 2px dashed var(--gold); width: 154px; }
+  .wg-pl-prefab .wg-pl-glyph { cursor: default; }
+  .wg-pl-prefab.over { border-color: var(--cream); background: #231F19; border-style: solid; }
+  .wg-pl-sw { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 7px; }
+  .wg-pl-sw button { width: 17px; height: 17px; border-radius: 4px; border: 1px solid rgba(0,0,0,.45);
+                     cursor: pointer; padding: 0; }
+  .wg-pl-sw button.sel { outline: 2px solid var(--cream); outline-offset: 1px; }
+  .wg-pl-ghost { position: fixed; z-index: 99; pointer-events: none; opacity: .85; margin: -24px 0 0 -24px; }
+
   .wk-error { padding: 48px 20px; text-align: center; font-family: var(--mono); font-size: 13px;
               color: var(--pink); line-height: 1.8; }
 
@@ -655,6 +683,125 @@
       }
       select(st.sel);
       requestAnimationFrame(tick);
+    },
+
+    /* prefab lab: scene on top with three instances of one prefab; assets
+       below with a Cube and a House flanking the prefab slot. Dragging an
+       asset onto the prefab redefines it; recoloring an asset propagates
+       to the prefab and every instance. */
+    prefablab: function (mount) {
+      var PL = W.widgets.prefablab;
+      var st = { prefab: 'cube', colors: { cube: PL.defaults.cube, house: PL.defaults.house } };
+
+      function glyph(type, color, size) {
+        var body = type === 'cube'
+          ? '<polygon points="20,30 60,30 60,70 20,70" fill="' + color + '"/>'
+            + '<polygon points="20,30 35,18 75,18 60,30" fill="' + color + '"/>'
+            + '<polygon points="20,30 35,18 75,18 60,30" fill="#FFFFFF" fill-opacity=".28"/>'
+            + '<polygon points="60,30 75,18 75,58 60,70" fill="' + color + '"/>'
+            + '<polygon points="60,30 75,18 75,58 60,70" fill="#000000" fill-opacity=".3"/>'
+            + '<polygon points="20,30 60,30 60,70 20,70" fill="none" stroke="#0F0E0C" stroke-opacity=".4"/>'
+          : '<polygon points="14,40 40,16 66,40" fill="' + color + '"/>'
+            + '<polygon points="14,40 40,16 66,40" fill="#000000" fill-opacity=".3"/>'
+            + '<rect x="19" y="40" width="42" height="32" fill="' + color + '"/>'
+            + '<rect x="34" y="52" width="12" height="20" fill="#0F0E0C" fill-opacity=".6"/>'
+            + '<rect x="24" y="45" width="8" height="7" fill="#FFFFFF" fill-opacity=".35"/>';
+        return '<svg viewBox="0 0 80 80" width="' + size + '" height="' + size + '">' + body + '</svg>';
+      }
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">Prefabs · edit once, every copy updates</div>'
+        + '<div class="wg-pl-head">' + esc(PL.sceneHead) + '</div>'
+        + '<div class="wg-pl-scene">'
+        +   [0,1,2].map(function (i) {
+              return '<div class="wg-pl-inst"><span class="g"></span>'
+                + '<div class="nm">Building' + (i ? ' (' + i + ')' : '') + '</div></div>';
+            }).join('')
+        + '</div>'
+        + '<div class="wg-pl-head">' + esc(PL.assetsHead) + '</div>'
+        + '<div class="wg-pl-assets">'
+        +   '<div class="wg-pl-card" data-asset="cube"><div class="ttl">Cube</div>'
+        +     '<div class="wg-pl-glyph"></div><div class="wg-pl-sw"></div></div>'
+        +   '<div class="wg-pl-card wg-pl-prefab"><div class="ttl">' + esc(PL.prefabName) + '</div>'
+        +     '<div class="wg-pl-glyph"></div><div class="tag">' + esc(PL.prefabTag) + '</div></div>'
+        +   '<div class="wg-pl-card" data-asset="house"><div class="ttl">House</div>'
+        +     '<div class="wg-pl-glyph"></div><div class="wg-pl-sw"></div></div>'
+        + '</div>'
+        + '<div style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:10px 0 8px;">' + esc(PL.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var prefabCard = panel.querySelector('.wg-pl-prefab');
+
+      function renderAsset(type) {
+        var card = panel.querySelector('[data-asset="' + type + '"]');
+        card.querySelector('.wg-pl-glyph').innerHTML = glyph(type, st.colors[type], 62);
+        var sw = card.querySelector('.wg-pl-sw');
+        sw.innerHTML = '';
+        PL.colors.forEach(function (c) {
+          var b = el('button', st.colors[type] === c ? 'sel' : '');
+          b.style.background = c;
+          b.setAttribute('aria-label', type + ' color ' + c);
+          b.addEventListener('click', function () {
+            st.colors[type] = c;
+            renderAsset(type);
+            if (st.prefab === type) { renderPrefab(); renderScene(); }
+          });
+          sw.appendChild(b);
+        });
+      }
+      function renderPrefab() {
+        prefabCard.querySelector('.wg-pl-glyph').innerHTML = glyph(st.prefab, st.colors[st.prefab], 62);
+      }
+      function renderScene() {
+        panel.querySelectorAll('.wg-pl-inst .g').forEach(function (s) {
+          s.innerHTML = glyph(st.prefab, st.colors[st.prefab], 66);
+        });
+      }
+
+      /* pointer-based drag: asset glyph to prefab slot (copy, never move) */
+      function attachDrag(type) {
+        var src = panel.querySelector('[data-asset="' + type + '"] .wg-pl-glyph');
+        src.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          var ghost = el('div', 'wg-pl-ghost', glyph(type, st.colors[type], 48));
+          ghost.style.left = e.clientX + 'px';
+          ghost.style.top = e.clientY + 'px';
+          document.body.appendChild(ghost);
+          function overPrefab(ev) {
+            var r = prefabCard.getBoundingClientRect();
+            return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+          }
+          function move(ev) {
+            ghost.style.left = ev.clientX + 'px';
+            ghost.style.top = ev.clientY + 'px';
+            prefabCard.classList.toggle('over', overPrefab(ev));
+          }
+          function up(ev) {
+            document.removeEventListener('pointermove', move);
+            document.removeEventListener('pointerup', up);
+            document.removeEventListener('pointercancel', up);
+            ghost.remove();
+            prefabCard.classList.remove('over');
+            if (ev.type === 'pointerup' && overPrefab(ev)) {
+              st.prefab = type;
+              renderPrefab();
+              renderScene();
+            }
+          }
+          document.addEventListener('pointermove', move);
+          document.addEventListener('pointerup', up);
+          document.addEventListener('pointercancel', up);
+        });
+      }
+
+      renderAsset('cube');
+      renderAsset('house');
+      renderPrefab();
+      renderScene();
+      attachDrag('cube');
+      attachDrag('house');
     },
 
     quiz: function (mount) {

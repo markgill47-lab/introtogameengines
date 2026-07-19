@@ -33,7 +33,8 @@ window.SE266_WIKI = {
       { id: "cross-engine-dictionary", title: "Cross-Engine Dictionary" }
     ]},
     { name: "Supplemental", articles: [
-      { id: "solar-system", title: "The Solar System" }
+      { id: "solar-system", title: "The Solar System" },
+      { id: "prefab-lab", title: "The Prefab Lab" }
     ]},
     { name: "Practice", articles: [
       { id: "hierarchy-basics", title: "Exercise 1: Hierarchy Basics" },
@@ -72,6 +73,17 @@ window.SE266_WIKI = {
         { id: "moon", name: "Moon", kind: "body", depth: 4,
           note: "Local position (48, 0, 0), forever. Riding the MoonPivot, which rides the Earth, which rides the EarthPivot. Snack rides cart, cart rides plane." }
       ]
+    },
+
+    /* prefab lab: one asset definition, three scene instances */
+    prefablab: {
+      instruction: "Drag the Cube or the House onto the prefab to redefine it. Pick a color on an asset to edit it. The scene updates by itself.",
+      prefabName: "Building.prefab",
+      prefabTag: "every instance mirrors this",
+      sceneHead: "Scene",
+      assetsHead: "Assets · Project folder",
+      colors: ["#9D9284", "#B11226", "#D8A24A", "#6FBF73", "#2E4A6B", "#7D5BA6", "#E7B9C0", "#6B5A3A"],
+      defaults: { cube: "#9D9284", house: "#D8A24A" }
     },
 
     quiz: [
