@@ -32,7 +32,8 @@ window.SE266_WIKI = {
       { id: "gotchas", title: "Gotchas and Judgment Calls" }
     ]},
     { name: "Supplemental", articles: [
-      { id: "degrees-per-what", title: "Degrees per What?" }
+      { id: "degrees-per-what", title: "Degrees per What?" },
+      { id: "side-scroller", title: "The Side-Scroller" }
     ]},
     { name: "Practice", articles: [
       { id: "broken-twin", title: "Exercise 1: The Broken Twin" },
@@ -62,6 +63,21 @@ window.SE266_WIKI = {
       perFrameLabel: "degrees per frame",
       honestNote: "Honest: real units. Same speed on every machine, at every framerate.",
       bugNote: "The bug: speed now depends on framerate. On a 120 Hz monitor this runs twice as fast as on a 60 Hz one. Same slider, different game."
+    },
+
+    /* side-scroller: a tiny platformer whose real subject is the input HUD.
+       Movement polls GetKey (held); jump and attack poll GetKeyDown (edge). */
+    sidescroller: {
+      instruction: "Click the scene to play. A / D move, W jump, Space attack.",
+      moveLabel: "A / D · move",
+      jumpLabel: "W · jump",
+      attackLabel: "Space · attack",
+      getKey: "GetKey",
+      getKeyDown: "GetKeyDown",
+      heldTag: "held · fires every frame",
+      edgeTag: "edge · fires once per press",
+      focusHint: "Click to play",
+      note: "Movement is continuous, so it polls GetKey and fires every frame you hold a key. Jump and attack are discrete, so they poll GetKeyDown and fire exactly once per press, however long you hold. Watch the counters: GetKey races, GetKeyDown ticks."
     },
 
     quiz: [

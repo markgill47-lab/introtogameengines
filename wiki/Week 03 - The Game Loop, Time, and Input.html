@@ -313,6 +313,32 @@
   .wg-rl-note.bug { color: var(--pink); }
   .wg-rl-read { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
 
+  /* side-scroller (supplemental) */
+  .wg-ss2-view { position: relative; border: 1px solid var(--panel-border); border-radius: 10px;
+                 overflow: hidden; background: #0F0E0C; height: 300px; }
+  .wg-ss2-view canvas { display: block; outline: none; }
+  .wg-ss2-focus { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+                  background: rgba(15,14,12,.72); cursor: pointer; font-family: var(--mono);
+                  font-size: 13px; color: var(--cream); letter-spacing: .04em; }
+  .wg-ss2-focus.hide { display: none; }
+  .wg-ss2-focus span { border: 1px solid var(--chip-border); border-radius: 20px; padding: 9px 18px;
+                       background: var(--chip); }
+  .wg-ss2-hud { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .wg-ss2-flag { flex: 1; min-width: 150px; background: var(--panel); border: 1px solid var(--panel-border);
+                 border-radius: 10px; padding: 11px 13px; transition: border-color .1s, background .1s; }
+  .wg-ss2-flag .fn { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--dim); }
+  .wg-ss2-flag .ctl { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 2px; }
+  .wg-ss2-flag .tag { font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 6px; }
+  .wg-ss2-flag .cnt { font-family: var(--disp); font-weight: 900; font-size: 22px; color: var(--ink); margin-top: 4px; }
+  .wg-ss2-flag.key.lit { border-color: var(--green); background: #14201a; }
+  .wg-ss2-flag.key.lit .fn { color: var(--green); }
+  .wg-ss2-flag.edge.lit { border-color: var(--gold); background: #241f14; }
+  .wg-ss2-flag.edge.lit .fn { color: var(--gold); }
+  .wg-ss2-legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px;
+                   color: var(--mut); margin-top: 12px; }
+  .wg-ss2-legend span { display: flex; align-items: center; gap: 6px; }
+  .wg-ss2-legend .sw { width: 13px; height: 13px; border-radius: 3px; }
+
   .wk-error { padding: 48px 20px; text-align: center; font-family: var(--mono); font-size: 13px;
               color: var(--pink); line-height: 1.8; }
 
@@ -980,6 +1006,238 @@
         s.onerror = function () { init2D(); };
         document.head.appendChild(s);
       }
+    },
+
+    /* side-scroller: a minimalist platformer that exists to make the input HUD
+       tangible. Movement (A/D) polls held state, GetKey style: fires every frame
+       the key is down. Jump (W) and attack (Space) poll edges, GetKeyDown style:
+       fire once per press. The HUD counters make the difference visible: the
+       held counter races while you hold; the edge counters tick once per press.
+       Auto-repeat is filtered so a held key is one edge, which is exactly how a
+       real engine defines GetKeyDown (and how the Three.js note hand-builds it). */
+    sidescroller: function (mount) {
+      var SS = W.widgets.sidescroller;
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">The Side-Scroller · one input, two functions</div>'
+        + '<div class="wg-ss2-view"><div class="wg-ss2-focus"><span>' + esc(SS.focusHint) + '</span></div></div>'
+        + '<div class="wg-ss2-hud">'
+        +   '<div class="wg-ss2-flag key f-move"><div class="fn">' + esc(SS.getKey) + '</div>'
+        +     '<div class="ctl">' + esc(SS.moveLabel) + '</div><div class="cnt c-move">0</div>'
+        +     '<div class="tag">' + esc(SS.heldTag) + '</div></div>'
+        +   '<div class="wg-ss2-flag edge f-jump"><div class="fn">' + esc(SS.getKeyDown) + '</div>'
+        +     '<div class="ctl">' + esc(SS.jumpLabel) + '</div><div class="cnt c-jump">0</div>'
+        +     '<div class="tag">' + esc(SS.edgeTag) + '</div></div>'
+        +   '<div class="wg-ss2-flag edge f-attack"><div class="fn">' + esc(SS.getKeyDown) + '</div>'
+        +     '<div class="ctl">' + esc(SS.attackLabel) + '</div><div class="cnt c-attack">0</div>'
+        +     '<div class="tag">' + esc(SS.edgeTag) + '</div></div>'
+        + '</div>'
+        + '<div class="wg-ss2-legend">'
+        +   '<span><span class="sw" style="background:#D8A24A"></span>crate: attack to destroy</span>'
+        +   '<span><span class="sw" style="background:#6b6660"></span>stone: jump over it</span>'
+        +   '<span><span class="sw" style="background:#B11226"></span>your attack</span>'
+        + '</div>'
+        + '<div style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:10px 0 8px;">' + esc(SS.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var view = panel.querySelector('.wg-ss2-view');
+      var focusEl = panel.querySelector('.wg-ss2-focus');
+      var cMove = panel.querySelector('.c-move'), cJump = panel.querySelector('.c-jump'), cAttack = panel.querySelector('.c-attack');
+      var fMove = panel.querySelector('.f-move'), fJump = panel.querySelector('.f-jump'), fAttack = panel.querySelector('.f-attack');
+
+      var Wd = view.clientWidth || 640, Hd = 300;
+      var cv = document.createElement('canvas');
+      cv.width = Wd; cv.height = Hd; cv.tabIndex = 0;
+      view.insertBefore(cv, focusEl);
+      var g = cv.getContext('2d');
+
+      var GROUND = Hd - 40, BOUND = Wd / 3;
+      var GRAV = 1500, JUMPV = 590, MOVE = 220, BALLV = 400;
+
+      var held = {}, edge = {};
+      var counts = { move: 0, jump: 0, attack: 0 };
+      var flash = { jump: 0, attack: 0 };   /* ms timestamps for HUD blip */
+      var active = false;
+
+      var player = { x: 70, y: 0, vy: 0, grounded: true, face: 1, walk: 0, atk: 0, cd: 0 };
+      var camera = 0;
+      var obstacles = [], balls = [], nextX = 420, destroyed = 0;
+
+      function spawn(x) {
+        var destructible = Math.random() < 0.55;
+        obstacles.push({ x: x, w: destructible ? 30 : 34, h: destructible ? 30 : 40,
+                         destructible: destructible, alive: true });
+      }
+      spawn(nextX); nextX += 240; spawn(nextX); nextX += 260;
+
+      function norm(e) {
+        var k = e.key.toLowerCase();
+        if (k === 'w' || k === 'a' || k === 's' || k === 'd' || k === ' ' || k === 'spacebar') return k === 'spacebar' ? ' ' : k;
+        return null;
+      }
+      cv.addEventListener('keydown', function (e) {
+        var k = norm(e); if (!k) return;
+        e.preventDefault();
+        if (!held[k]) { held[k] = true; edge[k] = true; }   /* auto-repeat: held already true, no new edge */
+      });
+      cv.addEventListener('keyup', function (e) {
+        var k = norm(e); if (!k) return;
+        e.preventDefault(); held[k] = false;
+      });
+      function activate() { active = true; focusEl.classList.add('hide'); cv.focus(); }
+      focusEl.addEventListener('click', activate);
+      cv.addEventListener('pointerdown', activate);
+      cv.addEventListener('blur', function () { active = false; held = {}; focusEl.classList.remove('hide'); });
+
+      function rectHit(ax, aw, bx, bw) { return ax < bx + bw && ax + aw > bx; }
+
+      function update(dt, ts) {
+        /* movement: GetKey, continuous */
+        var dir = 0;
+        if (held['a']) dir -= 1;
+        if (held['d']) dir += 1;
+        if (dir !== 0) { player.face = dir; counts.move++; }
+        player.x += dir * MOVE * dt;
+
+        camera = Math.max(camera, player.x - BOUND);
+        if (player.x < camera + 6) player.x = camera + 6;   /* cannot leave the left edge */
+
+        /* jump: GetKeyDown, edge */
+        if (edge['w'] && player.grounded) { player.vy = JUMPV; player.grounded = false; counts.jump++; flash.jump = ts; }
+        /* attack: GetKeyDown, edge */
+        if (edge[' '] && player.cd <= 0) {
+          balls.push({ x: player.x + 14, y: GROUND - 26 - player.y, r: 6 });
+          player.cd = 0.32; player.atk = 0.22; counts.attack++; flash.attack = ts;
+        }
+        edge = {};   /* edges live one frame */
+
+        /* gravity */
+        player.vy -= GRAV * dt;
+        player.y += player.vy * dt;
+        if (player.y <= 0) { player.y = 0; player.vy = 0; player.grounded = true; }
+        player.cd -= dt; player.atk -= dt;
+        if (dir !== 0 && player.grounded) player.walk += dt * 9; else player.walk = 0;
+
+        /* horizontal block: cannot walk through a standing obstacle */
+        var pw = 22;
+        obstacles.forEach(function (o) {
+          if (!o.alive) return;
+          if (rectHit(player.x - pw / 2, pw, o.x, o.w) && player.y < o.h - 2) {
+            if (player.x < o.x) player.x = o.x - pw / 2;   /* approaching from the left */
+          }
+        });
+
+        /* balls */
+        balls.forEach(function (b) { b.x += BALLV * dt; });
+        balls = balls.filter(function (b) {
+          if (b.x > camera + Wd + 40) return false;
+          var kill = true;
+          for (var i = 0; i < obstacles.length; i++) {
+            var o = obstacles[i];
+            if (o.alive && rectHit(b.x - b.r, b.r * 2, o.x, o.w) && (GROUND - b.y) < o.h + 6) {
+              if (o.destructible) { o.alive = false; destroyed++; }
+              return false;   /* stone absorbs the ball too */
+            }
+          }
+          return kill;
+        });
+
+        /* spawn ahead, cull behind */
+        while (nextX < camera + Wd + 300) { spawn(nextX); nextX += 200 + Math.random() * 150; }
+        obstacles = obstacles.filter(function (o) { return o.x + o.w > camera - 60; });
+      }
+
+      function stick(cx, feetY) {
+        var hipY = feetY - 20, shY = feetY - 38, headY = feetY - 45;
+        g.strokeStyle = '#ECE5D8'; g.lineWidth = 2.4; g.lineCap = 'round';
+        g.fillStyle = '#241F18';
+        g.beginPath(); g.arc(cx, headY, 6, 0, Math.PI * 2); g.fill(); g.stroke();
+        g.beginPath(); g.moveTo(cx, headY + 6); g.lineTo(cx, hipY); g.stroke();
+        /* legs */
+        g.beginPath();
+        if (!player.grounded) { g.moveTo(cx, hipY); g.lineTo(cx - 7, feetY - 7); g.moveTo(cx, hipY); g.lineTo(cx + 9, feetY - 9); }
+        else {
+          var sw = Math.sin(player.walk) * 9;
+          g.moveTo(cx, hipY); g.lineTo(cx + sw, feetY);
+          g.moveTo(cx, hipY); g.lineTo(cx - sw, feetY);
+        }
+        g.stroke();
+        /* arms */
+        g.beginPath();
+        if (player.atk > 0) {
+          g.moveTo(cx, shY + 3); g.lineTo(cx + player.face * 16, shY + 1);   /* thrust */
+          g.moveTo(cx, shY + 3); g.lineTo(cx - player.face * 8, shY + 13);
+        } else if (!player.grounded) {
+          g.moveTo(cx, shY + 3); g.lineTo(cx - 9, shY - 6); g.moveTo(cx, shY + 3); g.lineTo(cx + 9, shY - 6);
+        } else {
+          var asw = Math.sin(player.walk) * 7;
+          g.moveTo(cx, shY + 3); g.lineTo(cx - asw, shY + 15);
+          g.moveTo(cx, shY + 3); g.lineTo(cx + asw, shY + 15);
+        }
+        g.stroke();
+      }
+
+      function draw() {
+        g.fillStyle = '#0F0E0C'; g.fillRect(0, 0, Wd, Hd);
+        /* parallax dots */
+        g.fillStyle = '#1a1712';
+        for (var i = 0; i < 40; i++) {
+          var sx = ((i * 137 - camera * 0.3) % (Wd + 20) + Wd + 20) % (Wd + 20) - 10;
+          g.fillRect(sx, 30 + (i * 53) % (GROUND - 60), 2, 2);
+        }
+        /* ground */
+        g.strokeStyle = '#2E2A20'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(0, GROUND); g.lineTo(Wd, GROUND); g.stroke();
+        g.fillStyle = '#141210'; g.fillRect(0, GROUND, Wd, Hd - GROUND);
+        /* boundary hint */
+        g.strokeStyle = 'rgba(216,162,74,.14)'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(BOUND, 0); g.lineTo(BOUND, GROUND); g.stroke();
+        /* obstacles */
+        obstacles.forEach(function (o) {
+          if (!o.alive) return;
+          var sx = o.x - camera, sy = GROUND - o.h;
+          if (o.destructible) {
+            g.fillStyle = '#D8A24A'; g.fillRect(sx, sy, o.w, o.h);
+            g.strokeStyle = '#8a6a2f'; g.lineWidth = 1.5; g.strokeRect(sx + 0.5, sy + 0.5, o.w - 1, o.h - 1);
+            g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + o.w, sy + o.h); g.moveTo(sx + o.w, sy); g.lineTo(sx, sy + o.h); g.stroke();
+          } else {
+            g.fillStyle = '#6b6660'; g.fillRect(sx, sy, o.w, o.h);
+            g.strokeStyle = '#3a3630'; g.lineWidth = 1.5; g.strokeRect(sx + 0.5, sy + 0.5, o.w - 1, o.h - 1);
+          }
+        });
+        /* balls */
+        g.fillStyle = '#B11226';
+        balls.forEach(function (b) { g.beginPath(); g.arc(b.x - camera, b.y, b.r, 0, Math.PI * 2); g.fill(); });
+        /* player */
+        stick(player.x - camera, GROUND - player.y);
+        /* score */
+        g.fillStyle = '#8A8072'; g.font = '11px monospace'; g.textAlign = 'left';
+        g.fillText('destroyed: ' + destroyed, 10, 18);
+      }
+
+      function hud(ts) {
+        var moving = !!(held['a'] || held['d']);
+        fMove.classList.toggle('lit', moving && active);
+        fJump.classList.toggle('lit', ts - flash.jump < 170);
+        fAttack.classList.toggle('lit', ts - flash.attack < 170);
+        cMove.textContent = counts.move;
+        cJump.textContent = counts.jump;
+        cAttack.textContent = counts.attack;
+      }
+
+      var last = null;
+      function loop(ts) {
+        if (!mount.isConnected) return;
+        var dt = last === null ? 0 : Math.min((ts - last) / 1000, 0.05);
+        last = ts;
+        if (active) update(dt, ts);
+        draw();
+        hud(ts);
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
     },
 
     quiz: function (mount) {
