@@ -58,11 +58,31 @@ window.SE266_WIKI = {
     ]},
     { name: "Check Yourself", articles: [
       { id: "check-yourself", title: "Check Yourself" }
+    ]},
+    { name: "Supplemental", articles: [
+      { id: "the-render-pipeline", title: "The Render Pipeline" }
     ]}
   ],
 
   /* ---- widget data ---- */
   widgets: {
+
+    /* the render pipeline: five stages, stacked; each opens a modal */
+    renderpipeline: {
+      instruction: "Select a stage to open it up.",
+      stages: [
+        { id: "logic", name: "Logic", tag: "what exists, and where",
+          body: "Before anything draws, the game decides what the world even contains this frame: which objects exist, where their transforms put them, which camera is looking, and what can be skipped entirely. Culling lives here. If the castle is behind the camera, the stages below never hear about it.\n\nThis stage is the handoff from the scene tree (Week 2's whole subject) to the machinery below. Nothing here has a color yet: it's all positions, visibility, and lists." },
+        { id: "sort", name: "Sort", tag: "what draws in which order",
+          body: "The renderer doesn't draw things in the order you created them; it draws them in the order that's correct and fast. Opaque objects sort roughly front to back, so pixels hidden behind closer objects get rejected early instead of computed and thrown away. Transparent objects sort the other way, back to front, because glass has to draw over what's behind it.\n\nMaterials also get grouped here so the GPU changes state as rarely as possible. When a see-through effect draws in the wrong order in Week 7, this stage is where you'll come looking." },
+        { id: "color", name: "Color", tag: "the surface's base look",
+          body: "Every surface starts with an answer to \"what color is this before any lighting?\" That's the material's base color: texture maps, tints, the flat gray of your greybox cubes. No lights involved yet. Think of it as the object's opinion of itself.\n\nThe material sliders you'll set all semester (Metallic, Smoothness) live at this stage and the next. What they actually mean, derived, is a Deeper Water topic: [[res:pbr|PBR Materials]] in the library." },
+        { id: "shade", name: "Shade", tag: "light gets its vote",
+          body: "Now every light that reaches the surface changes the answer: direction, distance, falloff, shadow. In 2002 I decided how light fell off across a surface, mathematically, and then implemented it. Today it's a dropdown, and this stage is the dropdown doing its work.\n\nShaders are the small programs that run this math, and writing your own is the classic show-off layer on a final project. The gentle way in is [[res:shaders|The Book of Shaders]], in the library." },
+        { id: "rasterize", name: "Rasterize", tag: "triangles become pixels",
+          body: "The final translation: lit triangles become the actual pixels of this frame. The rasterizer walks each triangle, works out which pixels it covers, checks depth so nearer surfaces win, and writes the result into the framebuffer your monitor displays.\n\nEverything above this was geometry and math. This is where it becomes a picture, sixty-ish times a second, and then the loop starts over. Week 3 is about that loop." }
+      ]
+    },
 
     /* organ navigation grid: items link to their articles */
     anatomy: [
