@@ -14,4 +14,4 @@ The practical use of MDA is diagnostic. The player says "it feels grindy" (aesth
 
 That trace, feeling to behavior to rule, is the fundamental move of game design, and [[a12-template|Assignment 12]] will grade whether you can perform it on someone else's game.
 
-*Next: [[verbs-resources-feedback|Verbs, Resources, Feedback Loops]], the tools that do most of the analytical work. The primary source is [[res:mda|the MDA paper itself]], five pages, in the library.*
+*Next: [[player-promises|Player Promises]], the contract strung across the gap MDA describes. The primary source for MDA is [[res:mda|the paper itself]], five pages, in the library.*
