@@ -60,7 +60,8 @@ window.SE266_WIKI = {
       { id: "check-yourself", title: "Check Yourself" }
     ]},
     { name: "Supplemental", articles: [
-      { id: "the-render-pipeline", title: "The Render Pipeline" }
+      { id: "the-render-pipeline", title: "The Render Pipeline" },
+      { id: "unity-lifecycle", title: "The Unity Lifecycle" }
     ]}
   ],
 
@@ -82,6 +83,39 @@ window.SE266_WIKI = {
         { id: "rasterize", name: "Rasterize", tag: "triangles become pixels",
           body: "The final translation: lit triangles become the actual pixels of this frame. The rasterizer walks each triangle, works out which pixels it covers, checks depth so nearer surfaces win, and writes the result into the framebuffer your monitor displays.\n\nEverything above this was geometry and math. This is where it becomes a picture, sixty-ish times a second, and then the loop starts over. Week 3 is about that loop." }
       ]
+    },
+
+    /* Unity's lifecycle: startup methods, the loop, and coroutines */
+    unitylifecycle: {
+      instruction: "Select a method to open it up.",
+      startup: {
+        label: "Startup · once, in this order",
+        caption: "runs when an object arrives",
+        methods: [
+          { id: "awake", name: "Awake", tag: "first word, once",
+            body: "The engine calls Awake exactly once per object, the moment the object exists in a loaded scene, before anything else runs. This is the place for self-setup: caching references to your own components, initializing internal state.\n\nOne rule saves real debugging: don't talk to other objects here. Their Awake may not have run yet, and the order between objects is not guaranteed. Set yourself up; introductions come later, in Start." },
+          { id: "onenable", name: "OnEnable", tag: "every time you wake up",
+            body: "Awake runs once. OnEnable runs every time the object or component becomes enabled: once at startup, and again whenever something switches it back on. Its mirror is OnDisable, called on the way out.\n\nThe professional habit that starts here: subscribe to events in OnEnable, unsubscribe in OnDisable, always as a pair. Week 11 makes that sentence load-bearing when the Observer pattern arrives. For now, file the symmetry." },
+          { id: "start", name: "Start", tag: "safe introductions, once",
+            body: "Start runs once, just before the object's first Update, and only if the object is enabled. By the time Start runs, every object in the scene has finished Awake, which makes this the safe place for introductions: find the player, register with a manager, read another object's state.\n\nSelf-setup in Awake, introductions in Start. That split resolves most first-semester initialization bugs before they happen." }
+        ]
+      },
+      loop: {
+        label: "The Loop · every frame, forever",
+        caption: "one revolution ≈ 16 ms",
+        methods: [
+          { id: "fixedupdate", name: "FixedUpdate", tag: "the physics clock",
+            body: "The visible loop runs as fast as the frame allows. Physics refuses to live that way: it runs on its own fixed clock, every 0.02 seconds by default, and the engine calls FixedUpdate zero, one, or several times per frame to keep the two clocks aligned.\n\nForces, rigidbody movement, anything physical belongs here, and Week 5 lives here. Why an engine needs two clocks at all is a genuinely great question, and the classic answer is in the library: [[res:gaffer|Fix Your Timestep!]]" },
+          { id: "update", name: "Update", tag: "once per frame",
+            body: "The heartbeat. The engine calls Update on every enabled script, once per frame, forever, and this is where most gameplay lives: reading input, moving things, deciding things.\n\nFrames are not all the same length, which is why the windmill script in Week 2's practice guide multiplies by Time.deltaTime. That one idea, per-frame time made explicit, is most of Week 3, and it's the difference between a game that runs the same speed on every machine and one that doesn't." },
+          { id: "lateupdate", name: "LateUpdate", tag: "the last word each frame",
+            body: "After every script's Update has run, the engine makes one more pass: LateUpdate. It exists for work that needs to see the frame's finished state, and the canonical tenant is the camera: let the player move first, then have the camera follow, so it never films where the target used to be.\n\nWeek 7 builds that follow rig, and this is where it will live." }
+        ]
+      },
+      coroutine: {
+        name: "Coroutines", tag: "one task, across many frames",
+        caption: "one pass of this arrow spans many turns of the loop",
+        body: "Sometimes a task is bigger than a frame: fade the screen over two seconds, open a door at a fixed speed, spawn a wave one enemy at a time. A coroutine is Unity's way to write that as one readable function that politely borrows a slice of many frames.\n\nThe magic word is yield. \"yield return null\" pauses the function until next frame; \"yield return new WaitForSeconds(2f)\" pauses it across however many frames two seconds turns out to be. Each frame the engine resumes the function exactly where it left off, until it runs out. That's the slow arrow under the loop: one pass of the task, many revolutions of the engine.\n\nOne caveat before Week 3 formalizes all of this: a coroutine is not a thread. It runs on the main loop, in its turn, like everything else. It just remembers where it was." }
     },
 
     /* organ navigation grid: items link to their articles */

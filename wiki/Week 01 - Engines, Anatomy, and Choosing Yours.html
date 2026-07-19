@@ -275,6 +275,59 @@
                 color: var(--dim); font-family: var(--mono); font-size: 16px; }
   .wg-modal-x:hover { color: var(--cream); }
 
+  /* unity lifecycle (supplemental) */
+  .wg-panel { container-type: inline-size; }
+  .wg-ul-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+               gap: 6px; padding: 14px 0 4px; }
+  .wg-ul-card { background: var(--card); border: 1px solid var(--chip-border); border-radius: 12px;
+                padding: 13px 15px; width: 196px; position: relative; z-index: 1; }
+  .wg-ul-loopcard { width: 172px; padding: 11px 13px; }
+  .wg-ul-label { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+                 color: var(--gold); text-align: center; margin-bottom: 4px; }
+  .wg-ul-m { display: block; width: 100%; cursor: pointer; background: var(--panel);
+             border: 1px solid var(--chip-border); border-radius: 8px; padding: 8px 10px; margin-top: 7px;
+             text-align: center; font-family: var(--mono); font-size: 13px; color: var(--ink); position: relative; }
+  .wg-ul-m:hover { border-color: var(--gold); background: #231F19; }
+  .wg-ul-m .mtick, .wg-ul-coro .mtick { position: absolute; right: 9px; top: 8px; font-family: var(--mono);
+             font-size: 11px; color: var(--green); visibility: hidden; }
+  .wg-ul-m.seen .mtick, .wg-ul-coro.seen .mtick { visibility: visible; }
+  .wg-ul-caption { font-family: var(--mono); font-size: 10px; color: var(--faint); text-align: center;
+                   margin-top: 8px; }
+  .wg-ul-arrow { flex: none; width: 58px; height: 4px; background: #4d463a; position: relative;
+                 margin: 0 14px 0 8px; border-radius: 2px; }
+  .wg-ul-arrow::after { content: ""; position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+                        width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+                        border-left: 13px solid #4d463a; }
+  .wg-ul-ringwrap { position: relative; width: 258px; height: 258px; flex: none;
+                    display: flex; align-items: center; justify-content: center; }
+  .wg-ul-ring { position: absolute; inset: 5px; border: 3px dashed var(--red); border-radius: 50%;
+                opacity: .8; animation: wg-ul-spin 1.6s linear infinite; }
+  @keyframes wg-ul-spin { to { transform: rotate(360deg); } }
+  .wg-ul-bottom { display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
+  .wg-ul-slow { width: 258px; height: 6px; border-radius: 3px; position: relative; opacity: .8;
+                background: repeating-linear-gradient(90deg, var(--gold) 0 12px, transparent 12px 26px);
+                animation: wg-ul-slowflow 3.2s linear infinite; }
+  .wg-ul-slow::after { content: ""; position: absolute; right: -13px; top: 50%; transform: translateY(-50%);
+                       width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+                       border-left: 14px solid var(--gold); opacity: .9; }
+  @keyframes wg-ul-slowflow { to { background-position: 26px 0; } }
+  .wg-ul-coro { position: relative; cursor: pointer; margin-top: 10px; width: min(420px, 94%);
+                background: var(--card); border: 1px solid var(--chip-border); border-radius: 12px;
+                padding: 13px 18px; text-align: center; }
+  .wg-ul-coro:hover { border-color: var(--gold); background: #231F19; }
+  .wg-ul-coro .cname { font-family: var(--disp); font-weight: 900; font-size: 17px; text-transform: uppercase;
+                       letter-spacing: .02em; color: var(--cream); }
+  .wg-ul-coro .ctag { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 3px; }
+
+  @container (max-width: 579px) {
+    .wg-ul-arrow { flex-basis: 100%; height: 46px; margin: 4px 0 10px; background: none; }
+    .wg-ul-arrow::before { content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+                           top: 0; bottom: 0; width: 4px; border-radius: 2px; background: #4d463a; }
+    .wg-ul-arrow::after { right: auto; left: 50%; top: auto; bottom: -11px; transform: translateX(-50%);
+                          border-left: 8px solid transparent; border-right: 8px solid transparent;
+                          border-top: 13px solid #4d463a; border-bottom: none; }
+  }
+
   .wk-error { padding: 48px 20px; text-align: center; font-family: var(--mono); font-size: 13px;
               color: var(--pink); line-height: 1.8; }
 
@@ -440,6 +493,27 @@
   }
 
   /* ================= widgets ================= */
+  /* shared modal for widget elements: {name, tag, body} with wiki links */
+  function wgModalClose() {
+    document.querySelectorAll('.wg-modal-backdrop').forEach(function (m) { m.remove(); });
+    document.removeEventListener('keydown', wgModalEsc);
+  }
+  function wgModalEsc(e) { if (e.key === 'Escape') wgModalClose(); }
+  function wgModalOpen(s) {
+    wgModalClose();
+    var back = el('div', 'wg-modal-backdrop');
+    var box = el('div', 'wg-modal');
+    box.innerHTML = '<button class="wg-modal-x" aria-label="Close">✕</button>'
+      + '<h3>' + esc(s.name) + '</h3>'
+      + '<div class="mtag">' + esc(s.tag) + '</div>'
+      + s.body.split(/\n\n+/).map(function (para) { return '<p>' + inline(para) + '</p>'; }).join('');
+    back.appendChild(box);
+    back.addEventListener('click', function (e) { if (e.target === back) wgModalClose(); });
+    box.querySelector('.wg-modal-x').addEventListener('click', wgModalClose);
+    document.addEventListener('keydown', wgModalEsc);
+    document.body.appendChild(back);
+  }
+
   var widgets = {
 
     anatomy: function (mount) {
@@ -533,26 +607,6 @@
     renderpipeline: function (mount) {
       var RP = W.widgets.renderpipeline;
       var seen = {};
-      function escClose(e) { if (e.key === 'Escape') closeModal(); }
-      function closeModal() {
-        var m = document.querySelector('.wg-modal-backdrop');
-        if (m) m.remove();
-        document.removeEventListener('keydown', escClose);
-      }
-      function openModal(s) {
-        closeModal();
-        var back = el('div', 'wg-modal-backdrop');
-        var box = el('div', 'wg-modal');
-        box.innerHTML = '<button class="wg-modal-x" aria-label="Close">✕</button>'
-          + '<h3>' + esc(s.name) + '</h3>'
-          + '<div class="mtag">' + esc(s.tag) + '</div>'
-          + s.body.split(/\n\n+/).map(function (para) { return '<p>' + inline(para) + '</p>'; }).join('');
-        back.appendChild(box);
-        back.addEventListener('click', function (e) { if (e.target === back) closeModal(); });
-        box.querySelector('.wg-modal-x').addEventListener('click', closeModal);
-        document.addEventListener('keydown', escClose);
-        document.body.appendChild(back);
-      }
       function paint() {
         mount.innerHTML = '';
         var panel = el('div', 'wg-panel');
@@ -564,11 +618,58 @@
           var b = el('button', 'wg-rp-stage' + (seen[s.id] ? ' seen' : ''));
           b.innerHTML = '<span class="rtick">✓</span><span class="rname">' + esc(s.name) + '</span>'
             + '<div class="rtag">' + esc(s.tag) + '</div>';
-          b.addEventListener('click', function () { seen[s.id] = true; paint(); openModal(s); });
+          b.addEventListener('click', function () { seen[s.id] = true; paint(); wgModalOpen(s); });
           pipe.appendChild(b);
         });
         panel.appendChild(pipe);
         panel.appendChild(el('div', 'wg-rp-note', esc(RP.instruction)));
+        mount.appendChild(panel);
+      }
+      paint();
+    },
+
+    /* Unity's lifecycle: startup methods feed the loop (fast animated ring);
+       a coroutine spans many loop turns (slow arrow). Methods open modals. */
+    unitylifecycle: function (mount) {
+      var UL = W.widgets.unitylifecycle;
+      var seen = {};
+      function methodBtn(m) {
+        var b = el('button', 'wg-ul-m' + (seen[m.id] ? ' seen' : ''));
+        b.innerHTML = '<span class="mtick">✓</span>' + esc(m.name);
+        b.addEventListener('click', function () { seen[m.id] = true; paint(); wgModalOpen(m); });
+        return b;
+      }
+      function paint() {
+        mount.innerHTML = '';
+        var panel = el('div', 'wg-panel');
+        panel.style.padding = '16px 18px 10px';
+        panel.appendChild(el('div', 'wg-label', 'The Unity Lifecycle · the engine calls you'));
+        var row = el('div', 'wg-ul-row');
+        var su = el('div', 'wg-ul-card');
+        su.appendChild(el('div', 'wg-ul-label', esc(UL.startup.label)));
+        UL.startup.methods.forEach(function (m) { su.appendChild(methodBtn(m)); });
+        su.appendChild(el('div', 'wg-ul-caption', esc(UL.startup.caption)));
+        row.appendChild(su);
+        row.appendChild(el('div', 'wg-ul-arrow'));
+        var wrap = el('div', 'wg-ul-ringwrap');
+        wrap.appendChild(el('div', 'wg-ul-ring'));
+        var lp = el('div', 'wg-ul-card wg-ul-loopcard');
+        lp.appendChild(el('div', 'wg-ul-label', esc(UL.loop.label)));
+        UL.loop.methods.forEach(function (m) { lp.appendChild(methodBtn(m)); });
+        lp.appendChild(el('div', 'wg-ul-caption', esc(UL.loop.caption)));
+        wrap.appendChild(lp);
+        row.appendChild(wrap);
+        panel.appendChild(row);
+        var bottom = el('div', 'wg-ul-bottom');
+        bottom.appendChild(el('div', 'wg-ul-slow'));
+        bottom.appendChild(el('div', 'wg-ul-caption', esc(UL.coroutine.caption)));
+        var coro = el('button', 'wg-ul-coro' + (seen.coroutine ? ' seen' : ''));
+        coro.innerHTML = '<span class="mtick">✓</span><span class="cname">' + esc(UL.coroutine.name) + '</span>'
+          + '<div class="ctag">' + esc(UL.coroutine.tag) + '</div>';
+        coro.addEventListener('click', function () { seen.coroutine = true; paint(); wgModalOpen(UL.coroutine); });
+        bottom.appendChild(coro);
+        panel.appendChild(bottom);
+        panel.appendChild(el('div', 'wg-rp-note', esc(UL.instruction)));
         mount.appendChild(panel);
       }
       paint();
