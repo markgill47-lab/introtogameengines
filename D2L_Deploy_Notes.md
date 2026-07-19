@@ -61,6 +61,21 @@ what actually happened so Weeks 02–16 deploy without re-discovery.
 
 ## Browser-automation gotchas (learned the hard way)
 
+- **The two upload surfaces use different file-input mechanisms.** The Lessons "Add
+  Existing" drop zone (new-topic upload) hides its `input[type=file]` inside a
+  `D2L-LABS-FILE-UPLOADER` custom element's **shadow root**, nested inside the
+  `smart-curriculum` app iframe. Classic **Manage Files** upload instead renders its
+  whole dialog inside a same-origin `blank.html` target iframe, and the real input is
+  `input.d2l-fileinput-input[type=file]` there (two copies exist; use the first).
+  Neither is visible to a plain `document.querySelectorAll('input[type=file]')` from
+  the top frame — walk into iframes and shadow roots to find them. Click the visible
+  "Upload" button first (it lazily renders the input/iframe); only then query for it.
+- **CORS.** File bytes are fetched browser-side from `w.fetch()` inside the target
+  iframe's own realm, so plain `python3 -m http.server` won't work: it sends no
+  `Access-Control-Allow-Origin` header and the cross-origin fetch from
+  `stcloudstate.learn.minnstate.edu` silently fails. Run a small custom server that
+  adds `Access-Control-Allow-Origin: *` (see scratchpad `cors_server.py` pattern) on a
+  second port, alongside the plain preview server used for local browsing.
 - **The "Confirm File Replace" dialog needs real clicks.** Its checkboxes are shadow-DOM
   components; ticking them from page JS silently fails and D2L then saves the upload as
   `name(1).html` copies instead of overwriting. Click the dialog's select-all checkbox
