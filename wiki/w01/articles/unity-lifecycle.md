@@ -4,7 +4,9 @@
 
 Here is the point of an engine, made concrete. Look at the methods below and notice what's missing: **you never call any of them.** There is no main() with your name on it. You write Awake, Start, Update; the engine calls them, at the right moment, in the right order, forever. Old-timers call this the Hollywood principle: don't call us, we'll call you. It's the first of the [[what-is-a-game-engine|three promises]] wearing its Unity costume.
 
-Every script you write this semester is a set of appointments with this machine. Startup methods run once when an object arrives. Then the loop spins, and keeps spinning, until the scene ends.
+The industry word for these is **callbacks**: functions you write but never call, handed to a system that calls you back when the moment is right. The term is not retro trivia; it's load-bearing vocabulary from JavaScript to every engine's documentation, and it names the deal precisely. You hand the engine your code. The engine owns the phone.
+
+Every script you write this semester is a set of appointments with this machine. Startup callbacks run once when an object arrives. Then the loop spins, and keeps spinning, until the scene ends.
 
 {{widget:unitylifecycle}}
 
