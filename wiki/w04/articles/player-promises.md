@@ -4,6 +4,22 @@ Start a game you have never played, and within about a minute you know, without 
 
 Every game makes promises the moment it starts, and most of them are unspoken. The [[genre-tour|genre]] makes them, the [[mda|mechanics]] you are taught make them, the art and the music make them, and above all the first hour makes them: the first hour is a promissory note for the shape of the rest. This is the honest version of the [[mda|designer-and-player]] relationship. The designer works in mechanics, the player lives in aesthetics, and the promise is the thread strung across that gap, carrying "here is what I am going to make you feel" from one end to the other.
 
+## The promise starts before you buy
+
+Back up further, because the contract does not begin at the title screen. It begins before you install, before you pay, sometimes before the game is even finished being made. By the time you press start you have already been promised a great deal, and you have already decided whether to believe it.
+
+**The studio makes promises.** When Bethesda announced their next game was Starfield, I knew, sight unseen, that it would be Skyrim in space, and that was enough for me to pre-order it. Notice what I actually bought: not a game, which did not yet exist for me to play, but a promise, backed by every Bethesda RPG that came before. A studio's whole back catalog is collateral on the next title.
+
+**The name makes promises.** You already have a fairly good idea what a new Final Fantasy is going to be, or a new Dragonlance, before you read a single preview. A franchise name is a promise with decades of compound interest on it, which is exactly why a name is both an asset and a liability: the brand pulls players in, and then the new game has to pay off every expectation the old ones deposited.
+
+**The marketing makes promises,** and it makes them densely. The trailer, the "from the creators of" tagline, the screenshots, the social-media post, and the tags on the Steam listing (Roguelike, Cozy, Souls-like, Metroidvania) are each a clause. A store page is a stack of promises the buyer reads in about eight seconds and then holds you to for the next eight hours.
+
+Here is the trap in all of it: pre-purchase promises are the easiest ones to break, because the studio makes them to *sell* and the game has to keep them to *satisfy*, and those are two different jobs with two different incentives. The gap between the promise on the store page and the game on the disc is exactly where refunds, review-bombs, and the word "overhyped" live. No Man's Sky is the textbook case: promised at launch, defaulted at launch, and then made to spend literally years rebuilding trust it had burned in a weekend. That it eventually succeeded is the exception that shows how expensive the lesson is.
+
+## The pitch deck is a promise with a budget
+
+You will build a pitch deck in a later course, and a pitch deck is nothing but player promises, formalized and with money attached. Every slide is a promise the finished game will have to keep: this is the core loop, this is the feel, this is who it is for. The whole skill of a good pitch is making promises exciting enough to get the thing greenlit and honest enough that the shipped game can actually cash them. Over-promise and you have described a game nobody can build, which is [[scope|scope]] failing in a nicer suit. The pitch is where player promises stop being something you notice in other people's games and become something you sign your name to.
+
 ## Chekhov's gun, in a game
 
 The playwright's rule: a rifle hung on the wall in the first act must be fired by the third, or it should not be on the wall. Games are full of guns on walls. A locked door promises a key. A big empty arena promises a boss. An item you cannot afford yet promises a reason to save. A skill tree promises that the choices in it are real. Hang the gun, fire the gun. When a game shows you something and never pays it off, a small part of the player keeps waiting, and "waiting for a thing that never comes" is not the aesthetic you were going for.

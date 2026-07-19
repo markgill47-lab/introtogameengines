@@ -8,7 +8,7 @@ See if you can answer these without looking:
 4. What is Tetris's central [[verbs-resources-feedback|resource]], and what does spending it look like? *([[tetris-deconstruction|answer here]])*
 5. Your dream game has fourteen verbs. What is the move, and which section told you? *([[scope|hint]])*
 6. A game gives you free rewards for an hour, then a wall you can pay to skip. Name the pattern, and state the one question that separates malicious design from honest design. *([[malicious-design|hint]])*
-7. Name three [[player-promises|promises]] a game makes in its first hour without saying a word, and what breaking one feels like.
+7. Name three [[player-promises|promises]] a game makes before you even install it (studio, name, marketing), and three it makes in its first hour without saying a word. What does breaking one feel like?
 8. Draw Bartle's two-by-two from memory: name the two axes and place all four player types. *([[bartle|hint]])*
 
 ## Or let the wiki quiz you
