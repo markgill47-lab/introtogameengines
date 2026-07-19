@@ -296,6 +296,23 @@
   .wg-pl-sw button.sel { outline: 2px solid var(--cream); outline-offset: 1px; }
   .wg-pl-ghost { position: fixed; z-index: 99; pointer-events: none; opacity: .85; margin: -24px 0 0 -24px; }
 
+  /* rate lab (supplemental) */
+  .wg-rl-view { border: 1px solid var(--panel-border); border-radius: 10px; background: #0F0E0C;
+                height: 320px; overflow: hidden; position: relative; }
+  .wg-rl-view canvas { display: block; }
+  .wg-rl-badge { position: absolute; top: 8px; right: 10px; font-family: var(--mono); font-size: 10px;
+                 color: var(--faint); pointer-events: none; }
+  .wg-rl-ctl { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; align-items: flex-start; }
+  .wg-rl-slider { flex: 1; min-width: 200px; }
+  .wg-rl-slider .lbl { display: flex; justify-content: space-between; font-family: var(--mono);
+                       font-size: 11px; color: var(--mut); margin-bottom: 6px; }
+  .wg-rl-slider .lbl .val { color: var(--gold); }
+  .wg-rl-toggle { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  .wg-rl-note { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; margin-top: 8px; }
+  .wg-rl-note.honest { color: var(--green); }
+  .wg-rl-note.bug { color: var(--pink); }
+  .wg-rl-read { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
   .wk-error { padding: 48px 20px; text-align: center; font-family: var(--mono); font-size: 13px;
               color: var(--pink); line-height: 1.8; }
 
@@ -802,6 +819,167 @@
       renderScene();
       attachDrag('cube');
       attachDrag('house');
+    },
+
+    /* rate lab: a gold square spinning on its central pivot and a red circle
+       orbiting it. Two sliders (-20..20) set the rates; a toggle switches the
+       units between degrees per second (honest, times dt) and degrees per
+       frame (the Turbo-button bug). Renders in three.js from a locally
+       vendored build; falls back to a 2D canvas if the library won't load. */
+    ratelab: function (mount) {
+      var RL = W.widgets.ratelab;
+      var st = { orbit: 10, spin: 10, perFrame: false };
+      var orbitAngle = 0, spinAngle = 0;   /* degrees */
+
+      var panel = el('div', 'wg-panel');
+      panel.style.padding = '16px 18px 10px';
+      panel.innerHTML = '<div class="wg-label">The Rate Lab · a square, a circle, and two rates</div>'
+        + '<div class="wg-rl-view"><span class="wg-rl-badge"></span></div>'
+        + '<div class="wg-rl-ctl">'
+        +   '<div class="wg-rl-slider"><div class="lbl"><span>' + esc(RL.orbitLabel) + '</span><span class="val v-orbit"></span></div>'
+        +     '<input class="s-orbit" type="range" min="-20" max="20" step="1" value="' + st.orbit + '"></div>'
+        +   '<div class="wg-rl-slider"><div class="lbl"><span>' + esc(RL.spinLabel) + '</span><span class="val v-spin"></span></div>'
+        +     '<input class="s-spin" type="range" min="-20" max="20" step="1" value="' + st.spin + '"></div>'
+        + '</div>'
+        + '<div class="wg-rl-toggle">'
+        +   '<button class="wg-opt t-sec on">' + esc(RL.perSecondLabel) + '</button>'
+        +   '<button class="wg-opt t-frame">' + esc(RL.perFrameLabel) + '</button>'
+        +   '<span class="wg-rl-read"></span>'
+        + '</div>'
+        + '<div class="wg-rl-note honest"></div>'
+        + '<div style="text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:10px 0 8px;">' + esc(RL.instruction) + '</div>';
+      mount.innerHTML = '';
+      mount.appendChild(panel);
+
+      var view = panel.querySelector('.wg-rl-view');
+      var read = panel.querySelector('.wg-rl-read');
+      var note = panel.querySelector('.wg-rl-note');
+
+      function unit() { return st.perFrame ? '°/frame' : '°/s'; }
+      function labels() {
+        panel.querySelector('.v-orbit').textContent = st.orbit + ' ' + unit();
+        panel.querySelector('.v-spin').textContent = st.spin + ' ' + unit();
+        panel.querySelector('.t-sec').className = 'wg-opt t-sec' + (st.perFrame ? '' : ' on');
+        panel.querySelector('.t-frame').className = 'wg-opt t-frame' + (st.perFrame ? ' on' : '');
+        note.className = 'wg-rl-note ' + (st.perFrame ? 'bug' : 'honest');
+        note.textContent = st.perFrame ? RL.bugNote : RL.honestNote;
+      }
+      panel.querySelector('.s-orbit').addEventListener('input', function () { st.orbit = +this.value; labels(); });
+      panel.querySelector('.s-spin').addEventListener('input', function () { st.spin = +this.value; labels(); });
+      panel.querySelector('.t-sec').addEventListener('click', function () { st.perFrame = false; labels(); });
+      panel.querySelector('.t-frame').addEventListener('click', function () { st.perFrame = true; labels(); });
+      labels();
+
+      /* advance the two angles by one frame's worth of motion */
+      function step(dt) {
+        var k = st.perFrame ? 1 : dt;
+        spinAngle = (spinAngle + st.spin * k) % 360;
+        orbitAngle = (orbitAngle + st.orbit * k) % 360;
+      }
+      var emaFps = 0;
+      function readout(rawDt) {
+        if (rawDt > 0) emaFps = emaFps ? emaFps * 0.95 + (1 / rawDt) * 0.05 : 1 / rawDt;
+        read.textContent = Math.round(emaFps) + ' fps · dt ' + (rawDt * 1000).toFixed(1) + ' ms';
+      }
+
+      function init3D() {
+        panel.querySelector('.wg-rl-badge').textContent = 'three.js';
+        var wpx = view.clientWidth || 640, hpx = 320;
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(wpx, hpx);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        view.appendChild(renderer.domElement);
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0F0E0C);
+        var camera = new THREE.PerspectiveCamera(45, wpx / hpx, 0.1, 100);
+        camera.position.set(0, 4.6, 7.2);
+        camera.lookAt(0, 0, 0);
+        scene.add(new THREE.GridHelper(12, 12, 0x2E2A20, 0x1a1712));
+        var cube = new THREE.Mesh(
+          new THREE.BoxGeometry(1.6, 1.6, 1.6),
+          new THREE.MeshStandardMaterial({ color: 0xD8A24A, roughness: 0.55, metalness: 0.15 }));
+        cube.position.y = 0.8;
+        scene.add(cube);
+        var pivot = new THREE.Group();
+        pivot.position.y = 0.55;
+        scene.add(pivot);
+        var ball = new THREE.Mesh(
+          new THREE.SphereGeometry(0.55, 32, 16),
+          new THREE.MeshStandardMaterial({ color: 0xB11226, roughness: 0.45, metalness: 0.1 }));
+        ball.position.x = 3;
+        pivot.add(ball);
+        var ringPts = [];
+        for (var i = 0; i <= 64; i++) {
+          var a = i / 64 * Math.PI * 2;
+          ringPts.push(new THREE.Vector3(Math.cos(a) * 3, 0.02, Math.sin(a) * 3));
+        }
+        scene.add(new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(ringPts),
+          new THREE.LineBasicMaterial({ color: 0xB11226, transparent: true, opacity: 0.35 })));
+        var sun = new THREE.DirectionalLight(0xFFF6E8, 1.15);
+        sun.position.set(3, 6, 4);
+        scene.add(sun);
+        scene.add(new THREE.AmbientLight(0x8a8072, 0.55));
+        var D2R = Math.PI / 180, last = null;
+        function tick(ts) {
+          if (!mount.isConnected) { renderer.dispose(); return; }
+          var rawDt = last === null ? 0 : (ts - last) / 1000;
+          last = ts;
+          step(Math.min(rawDt, 0.05));
+          readout(rawDt);
+          cube.rotation.y = spinAngle * D2R;
+          pivot.rotation.y = orbitAngle * D2R;
+          renderer.render(scene, camera);
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function init2D() {
+        panel.querySelector('.wg-rl-badge').textContent = '2d fallback';
+        var wpx = view.clientWidth || 640, hpx = 320;
+        var cv = document.createElement('canvas');
+        cv.width = wpx; cv.height = hpx;
+        view.appendChild(cv);
+        var g = cv.getContext('2d');
+        var cx = wpx / 2, cy = hpx / 2, R = 110;
+        var last = null;
+        function tick(ts) {
+          if (!mount.isConnected) return;
+          var rawDt = last === null ? 0 : (ts - last) / 1000;
+          last = ts;
+          step(Math.min(rawDt, 0.05));
+          readout(rawDt);
+          g.fillStyle = '#0F0E0C'; g.fillRect(0, 0, wpx, hpx);
+          g.strokeStyle = '#1a1712'; g.lineWidth = 1;
+          for (var x = 0; x <= wpx; x += 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, hpx); g.stroke(); }
+          for (var y = 0; y <= hpx; y += 24) { g.beginPath(); g.moveTo(0, y); g.lineTo(wpx, y); g.stroke(); }
+          g.strokeStyle = 'rgba(177,18,38,.35)'; g.lineWidth = 1.5;
+          g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.stroke();
+          g.save();
+          g.translate(cx, cy);
+          g.rotate(spinAngle * Math.PI / 180);
+          g.fillStyle = '#D8A24A';
+          g.fillRect(-32, -32, 64, 64);
+          g.restore();
+          var oa = orbitAngle * Math.PI / 180;
+          g.fillStyle = '#B11226';
+          g.beginPath(); g.arc(cx + Math.cos(oa) * R, cy + Math.sin(oa) * R, 16, 0, Math.PI * 2); g.fill();
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      /* three.js from the locally vendored build, by dynamic injection;
+         a static tag would be inert in D2L and a CDN could be blocked */
+      if (window.THREE) init3D();
+      else {
+        var s = document.createElement('script');
+        s.src = (window.SE266_WIKI_BASE || BASE) + 'vendor/three.min.js';
+        s.onload = function () { if (window.THREE) init3D(); else init2D(); };
+        s.onerror = function () { init2D(); };
+        document.head.appendChild(s);
+      }
     },
 
     quiz: function (mount) {

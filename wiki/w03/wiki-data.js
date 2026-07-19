@@ -31,6 +31,9 @@ window.SE266_WIKI = {
       { id: "cross-engine-dictionary", title: "Cross-Engine Dictionary" },
       { id: "gotchas", title: "Gotchas and Judgment Calls" }
     ]},
+    { name: "Supplemental", articles: [
+      { id: "degrees-per-what", title: "Degrees per What?" }
+    ]},
     { name: "Practice", articles: [
       { id: "broken-twin", title: "Exercise 1: The Broken Twin" },
       { id: "real-mover", title: "Exercise 2: The Real Mover" },
@@ -48,6 +51,18 @@ window.SE266_WIKI = {
   ],
 
   widgets: {
+
+    /* rate lab: a spinning square and an orbiting circle, in three.js
+       (2D canvas fallback), with a per-second / per-frame toggle */
+    ratelab: {
+      instruction: "Drag the sliders, then flip the toggle and watch the same numbers mean different things. A frame is not a unit of time.",
+      orbitLabel: "Circle orbit",
+      spinLabel: "Square spin",
+      perSecondLabel: "degrees per second",
+      perFrameLabel: "degrees per frame",
+      honestNote: "Honest: real units. Same speed on every machine, at every framerate.",
+      bugNote: "The bug: speed now depends on framerate. On a 120 Hz monitor this runs twice as fast as on a 60 Hz one. Same slider, different game."
+    },
 
     quiz: [
       { q: "In the stop-motion studio, what are the frame, the update, and delta time?",
