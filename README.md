@@ -29,6 +29,7 @@ Every assignment ships the same three deliverables regardless of engine: a **nar
 | [`CourseResources.md`](CourseResources.md) | The Free Library: every assigned and supplementary resource, all legally free |
 | [`OpenTexts_Research.md`](OpenTexts_Research.md) | Research notes behind the resource list |
 | `Week01/` … `Week16/` | Per-week modules: `_Outline`, `_Concepts`, `_Practice`, and the assignment `_Spec` files |
+| [`wiki/`](wiki/) | The student-facing course wikis, deployable to D2L. Mirrors the D2L content root exactly |
 | [`DemoGame_Plan.md`](DemoGame_Plan.md) | Plan for the running Unity demo game used across sessions |
 | [`marks-voice-guide.md`](marks-voice-guide.md) | Style guide all course documents follow (register by content type, and no em-dashes, ever) |
 
@@ -41,13 +42,25 @@ Each `WeekNN/` folder follows the same shape:
 - **`WeekNN_Practice.md`:** the Unity demo and studio/lab activity.
 - **`AN_Spec.md`:** the assignment spec, where that week introduces one (engine-neutral checklist of observable behaviors).
 
+### The course wikis
+
+`wiki/` holds the student-facing week wikis: a self-contained HTML shell per week at the top level, plus a `wNN/` folder holding that week's `wiki-data.js` and its `articles/*.md` prose. Some weeks also carry a `vendor/` folder for playable in-browser demos (Week 03 ships three.js supplementals: The Rate Lab and The Side-Scroller).
+
+**This folder mirrors the D2L content root exactly.** That is the point: previewing locally over HTTP behaves identically to the live course, cross-wiki links included. Two consequences worth knowing before you edit:
+
+- Each shell's `BASE` constant must match its folder (`w01/`, `w02/`, and so on).
+- Preview over HTTP, not `file://`, which blocks the article fetch.
+
+Articles link across wikis with `[[peer:article|label]]`, resolved through the `peers` registry in each `wiki-data.js`. Adding a new wiki means adding its entry to every peer list.
+
 ### D2L tooling
 
-Two supporting subprojects build and deploy the course shell in Brightspace/D2L:
+Supporting subprojects and notes for building and deploying the course shell in Brightspace/D2L:
 
 - [`scsu-d2l-design-system/`](scsu-d2l-design-system/README.md): the SCSU-branded design system (the "Husky Course Kit") for D2L content pages.
 - [`d2l-activity-skills/`](d2l-activity-skills/README.md): skills for building and deploying D2L activities.
 - [`D2L_Build_Spec.md`](D2L_Build_Spec.md): the spec tying the shell together.
+- [`D2L_Deploy_Notes.md`](D2L_Deploy_Notes.md): the per-week deploy workflow, tenant validation results, and the browser-automation gotchas, verified live against the Fa26 course. **Read this before deploying a week.** It carries the hard rules that keep a live topic from breaking: never rename a live topic, and never open one in D2L's HTML editor, because both re-serialize the page and silently kill interactivity.
 
 ---
 

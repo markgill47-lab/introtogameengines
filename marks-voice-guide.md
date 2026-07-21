@@ -126,4 +126,10 @@ Most single pieces of content will lean on one register but can borrow from anot
 ## Addendum: Rules Added in Working Sessions
 
 - **"Honest caveat" is banned, along with its cousins ("honest warning," "honest tradeoff," "honestly fine").** Redundant: a caveat that's not honest isn't a caveat. Say caveat, warning, or tradeoff, unqualified. (Added 2026-07-18.)
+
+- **Never use letter-plus-number shorthand in student-facing content.** Write "Assignment 3," not "A3." Write "Requirement 5," not "R5." Same for "Week 5," not "W5."
+
+  **Why:** these are second-semester students, most of them one course past Programming 2, reading course material while also learning an engine. The shorthand is transparent to the person who wrote the spec and opaque to the person reading it for the first time, and it costs the reader a lookup at exactly the moment they're trying to follow a requirement. Compressing "Requirement" to "R" saves the author ten characters and charges the student a context switch. Bad trade.
+
+  **How to apply:** the internal source docs (`WeekNN/A*_Spec.md`, practice guides, outlines) may keep the shorthand as working notation. It gets spelled out on the way into anything a student reads: the course wikis, D2L topics, and video narration. Same for the checklist and quiz strings inside `wiki-data.js`, which are student-facing even though they live in a code file. Internal filenames and article ids (`a3-spec`, `r1`) are identifiers, not prose, and stay as they are. (Added 2026-07-20.)
 - **No course-shorthand acronyms in student-facing text.** Write "Assignment 1," "Requirement 3," never "A1" or "R3": compressed course jargon is a wall for ESL students and first-generation students alike. Industry acronyms with real currency (MDA, FSM, PBR, LTS, A* the algorithm) are fine, defined once in passing per the vocabulary habits above. (Added 2026-07-19.)

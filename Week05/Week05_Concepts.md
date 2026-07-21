@@ -14,6 +14,14 @@ That question is this entire week, because it's a design choice you make per obj
 
 The new option this week is the release: for any object, you can **turn authority over to the physics engine**. Place it, give it a shove, and let it go. From then on gravity, collisions, and momentum decide where it is, your transform-writing days for that object are over, and your influence arrives the way the bowler's does: through forces, applied while you legitimately have the ball. In Unity, the component that signs authority over is the **Rigidbody**. Adding one to an object is the release; everything else this week is learning what you can and can't do after you've let go.
 
+### Where the metaphor has a seam
+
+Find this one on purpose, because students walk into it in the first ten minutes of the practice guide's throw exercise. When the bowler releases, the ball is *already moving*: it inherited the approach, the arm swing, and the spin off the fingers. Release isn't the beginning of the ball's motion; it's the moment authority changes hands over motion that already exists.
+
+Your engine doesn't do that. A body arrives in the simulation with **no velocity and no spin**, both exactly zero. It doesn't look at last frame's position and work out that the object was traveling, because scripted placement never told it anything about speed: your code was setting positions, and a position isn't a velocity. So the first thing most students see is a bowling ball that drops straight down and thuds on the floor when they expected it to sail down the lane. Nothing is broken; they handed the simulation an object at rest and it obliged.
+
+Whatever state a body has at the moment of transfer is whatever you explicitly gave it and nothing more. If it should leave your hand moving, you have to *be the arm*: set the velocity, or apply an impulse, at the instant of the handoff. That's exactly what the line after `Instantiate` is doing in the practice guide's rock thrower, and commenting it out for ten seconds is the cheapest demonstration of this idea in the whole week. The same seam appears when you flip a kinematic body to dynamic mid-game: a platform that's been sliding for ten seconds starts from a standstill and falls. If continuity matters there, set the velocity yourself as part of the switch rather than trusting the engine to carry it across.
+
 ---
 
 ## 1. What the simulation sees
@@ -116,6 +124,7 @@ Culture notes. Godot's Area3D reporting through *signals* is the Observer patter
 3. Why is teleporting a dynamic body by its transform a bug even when it looks like it worked?
 4. Your trigger zone fires no events as the player walks through. What's the first thing you check, and why is the failure silent?
 5. Throwing a rock: force or impulse, which update does it fire from, and where did delta time go?
+6. You hand a moving object to the simulation and it drops straight down instead of continuing on its way. What did the engine not inherit, and whose job was it to supply it?
 
 ---
 
