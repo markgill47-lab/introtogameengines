@@ -16,7 +16,8 @@ window.SE266_WIKI = {
     res: "The Free Library.html",
     w01: "Week 01 - Engines, Anatomy, and Choosing Yours.html",
     w02: "Week 02 - Scene Graphs, Transforms, and Coordinate Spaces.html",
-    w03: "Week 03 - The Game Loop, Time, and Input.html"
+    w03: "Week 03 - The Game Loop, Time, and Input.html",
+    w05: "Week 05 - Physics, Collision, and Authority.html"
   },
 
   /* ---- article manifest: sidebar order, grouped ---- */
