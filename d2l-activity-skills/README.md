@@ -1,16 +1,17 @@
-# D2L Activity Skills — for building & deploying interactive activities in D2L Brightspace
+# D2L Activity Skills — for building, illustrating & deploying content in D2L Brightspace
 
-Two paired Claude skills, distilled from real builds at SCSU. Together they let Claude
+Three Claude skills, distilled from real builds at SCSU. Together they let Claude
 **build** a self-contained interactive HTML/JS/SVG activity (maps, timelines, calculators,
-self-checking quizzes, decision trees, interactive diagrams — anything custom) and **deploy**
-it into a D2L Brightspace course as a content topic.
+self-checking quizzes, decision trees, interactive diagrams — anything custom), **illustrate**
+it with generated infographics, and **deploy** it into a D2L Brightspace course as a content topic.
 
 | Skill | What it does | Needs the browser/login? |
 |---|---|---|
 | **d2l-activity-builder** | Builds the activity as local file(s), following D2L's non-obvious sandbox rules so it works the first time | **No** — pure local file generation |
+| **d2l-infographic-generator** | Generates explanatory figures as images, verifies every string, and iterates with you through edits/regenerations while keeping every revision | **No** — needs an image-generation tool |
 | **d2l-activity-deployer** | Uploads the finished activity into your D2L course and wires it up as a topic | **Yes** — see requirements below |
 
-They're independent: you can build with one and deploy by hand, or use both together.
+They're independent: you can build with one and deploy by hand, or use all three together.
 
 ---
 
@@ -55,6 +56,15 @@ Claude follows the builder skill: it can first run a tiny **validation test** in
 tenant (recommended — behaviors vary slightly by school), then builds a self-contained activity
 with the right architecture.
 
+**Illustrate** — describe the figure you want; Claude takes a first stab rather than interviewing you:
+> "I need a diagram showing how the three moats erode over time — scale, data, distribution."
+
+Claude follows the infographic skill: generates candidates, **verifies every rendered string
+character-by-character** (generated figures invent titles and even fake "SOURCE:" lines — that's the
+real failure mode, not spelling), tells you what it found, and then iterates with you. It scores each
+change request to advise whether a targeted **edit** or a full **regeneration** is the better move, and
+keeps every revision so you can always fall back.
+
 **Deploy** — once you've met the requirements above:
 > "Deploy it to the Orientation course under the Welcome unit, titled 'Dining Guide'."
 
@@ -63,7 +73,7 @@ and verifies it actually initialized.
 
 ---
 
-## Two rules worth knowing up front
+## Three rules worth knowing up front
 
 These are baked into the skills, but they save the most grief, so know them:
 
@@ -73,6 +83,24 @@ These are baked into the skills, but they save the most grief, so know them:
    deploy** — name the file to the title you want (D2L drops the `.html`), so you never rename.
 2. **"It rendered" ≠ "it works."** Always confirm the activity actually initialized after
    deploying, not just that something appeared. The deployer skill does this for you.
+3. **If the activity has internal views, give it its own Back/Forward buttons.** The activity
+   runs inside D2L's page shell, so the *browser's* back button navigates D2L, not your activity —
+   a reader who follows a few internal links gets bounced out of the topic with no way back. Any
+   multi-page thing (a wiki, a drill-down map, a stepped exercise) needs an internal history stack
+   and on-screen nav controls. Easy to overlook until a reader hits it. Details in the builder
+   skill's `references/sandbox-rules.md` → "In-topic navigation."
+4. **A generated figure is not done until every string in it has been read.** Image models spell
+   reliably now; what they do instead is *invent* — unrequested titles, and fabricated
+   "SOURCE: …" attribution lines that look exactly like real citations. Verify character-by-character
+   against source, and check that the picture still makes the argument (a figure can be perfectly
+   labelled and still show the opposite of your point). Details in the infographic skill's
+   `references/failure-modes.md`.
+5. **A complex figure needs three texts, not one.** An infographic or diagram ships with a short `alt`, a
+   visible caption, and a **full long description** behind a visible "Describe this figure" button — because
+   `longdesc=` is obsolete and a screen-reader-only block misses sighted readers who can see the figure fine
+   but can't decode what the encoding *means*. Write the description only once the figure is final, or it
+   drifts out of sync with the image. Modal pattern (focus trap, Escape, focus return) is in the builder
+   skill; the writing standard is in the infographic skill.
 
 ---
 
