@@ -6,9 +6,9 @@
 
 ## What to do
 
-1. **Press the buttons and watch both sides move.** Damage changes a fact; the bar and the number are just reading it. Two displays, one fact, which is the arrangement [[game-state|the whole article]] is arguing for.
+1. **Press the buttons and watch both sides move.** Damage changes a fact. The bar and the number are just reading it. Two displays, one fact, which is the arrangement [[game-state|the whole article]] is arguing for.
 2. **Kill the scoreboard.** The right side goes dark. Nothing else happens, because nothing else depended on it.
-3. **Keep pressing the buttons with the display dead.** The facts move. Health drops. Gold accumulates. The game is completely fine; it simply has nobody watching.
+3. **Keep pressing the buttons with the display dead.** The facts move. Health drops. Gold accumulates. The game is completely fine. It simply has nobody watching.
 4. **Repair the scoreboard.** It does not need to be told what happened while it was out. It reads the current facts and shows them, correct on the first frame, because it never owned the truth to begin with.
 
 That last step is the one worth sitting with. A display that can be destroyed and rebuilt mid-game, and comes back correct with no recovery logic, is the observable proof that your state and your display are actually separate. If rebuilding your HUD would lose data, your HUD is holding data, and [[gotchas|that is this week's most expensive mistake]].

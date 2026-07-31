@@ -2,7 +2,7 @@
 
 A shape that fits 2–5 minutes:
 
-1. **The scorer and the scoreboard (60 sec):** code walkthrough of [[official-scorer|GameState]] (facts and legal changes, zero UI) and [[scoreboard-hud|HudController]] (pixels, zero logic). Say the direction of the street. Deliver the Week 11 debt line; it's part of the story. *(Covers Requirements 1 and 2.)*
+1. **The scorer and the scoreboard (60 sec):** code walkthrough of [[official-scorer|GameState]] (facts and legal changes, zero UI) and [[scoreboard-hud|HudController]] (pixels, zero logic). Say the direction of the street. Deliver the Week 11 debt line, because it's part of the story. *(Covers Requirements 1 and 2.)*
 2. **The circuit, twice (60–90 sec):** start → play (bars and gold moving) → death → restart → play again, on camera, with the second lap proving clean reset. *(Requirement 3.)*
 3. **Pause (30 sec):** world frozen, menu alive. Bonus points: show [[the-circuit|the pause-restart trap]] and its fix, since you built both anyway. *(Requirement 4.)*
 4. **The floating bar (30 sec):** [[floating-bar|dummy bar]] draining in the world, your HUD on the glass, one sentence on whose information lives where, billboard doing its job as the dummy turns. *(Requirement 5.)*

@@ -16,7 +16,7 @@ That arrangement is going to get uglier every week as states multiply. I know it
 
 ## Pause is a dividend from Week 3
 
-Set the engine's time scale to zero and delta time reports zero, so everything you correctly multiplied by dt (movement, spins, physics, timers) stops, for free.
+Set the engine's time scale to zero and delta time reports zero, so everything you correctly multiplied by dt (movement, spins, physics) stops, for free.
 
 **You already built pause in Week 3 without knowing it.** This week you just add the button.
 

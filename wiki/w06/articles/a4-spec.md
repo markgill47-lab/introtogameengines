@@ -25,13 +25,13 @@ An identifiable game-state object owns the facts (at minimum: a depletable resou
 At least two screen-space HUD elements bound to state, one of them a **filled bar** expressing a fraction (current over max), both visibly updating during play. A number that never moves on camera is scenery, not a HUD.
 
 **Requirement 3: The Full Circuit, Twice.**
-Start screen → gameplay → an end state (death or victory) → restart → gameplay again, all on camera. The second lap must demonstrate a genuinely clean reset: resources back at starting values, end-state panel gone. Restart by scene reload is the recommended mechanism; hand-rolled resets are legal but you own every value you forget.
+Start screen → gameplay → an end state (death or victory) → restart → gameplay again, all on camera. The second lap must demonstrate a genuinely clean reset: resources back at starting values, end-state panel gone. Restart by scene reload is the recommended mechanism. Hand-rolled resets are legal, but you own every value you forget.
 
 **Requirement 4: A Working Pause.**
-A pause that visibly freezes the world (moving objects stop; your Week 3 dt discipline is what makes this cheap) while the pause UI remains alive and interactive, and a resume that picks the world back up. If any object sails through your paused game, it's telling you it never met delta time. Fix it there, not in the pause.
+A pause that visibly freezes the world (moving objects stop, and your Week 3 dt discipline is what makes this cheap) while the pause UI remains alive and interactive, and a resume that picks the world back up. If any object sails through your paused game, it's telling you it never met delta time. Fix it there, not in the pause.
 
 **Requirement 5: One Thing in the World.**
-At least one world-space UI element attached to a scene object (a health bar over a dummy, a floating prompt, damage numbers), shown alongside the screen-space HUD, with one sentence of narration on the design test: [[screen-vs-world|whose information is this, the player's or the object's?]] Billboarding is expected if the element can face away from the camera; an edge-on invisible bar demonstrates the problem, not the solution.
+At least one world-space UI element attached to a scene object (a health bar over a dummy, a floating prompt, damage numbers), shown alongside the screen-space HUD, with one sentence of narration on the design test: [[screen-vs-world|whose information is this, the player's or the object's?]] Billboarding is expected if the element can face away from the camera. An edge-on invisible bar demonstrates the problem, not the solution.
 
 **Requirement 6: Standard Deliverables.**
 Narrated demo video (2–5 minutes) covering Requirements 1 through 5, source (repo link or zip), and a one-paragraph build note (what AI produced, what you fixed, what you would change).

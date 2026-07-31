@@ -1,6 +1,6 @@
 # Other Engines
 
-Same four exercises, different spellings. The [[cross-engine-dictionary|dictionary]] has the terminology; these are the notes beyond it.
+Same four exercises, different spellings. The [[cross-engine-dictionary|dictionary]] has the terminology. These are the notes beyond it.
 
 ## Godot
 

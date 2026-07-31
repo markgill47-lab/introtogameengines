@@ -5,7 +5,7 @@ One distinction closes out the concepts: *where does a piece of UI live?*
 - **Screen space:** painted on the glass. Fixed to the frame, same place regardless of where the camera looks. The HUD, the menus, the score. A property of the **player's view**.
 - **World space:** attached to a thing *in* the scene. The health bar floating over an enemy's head, the "PRESS E" prompt hovering on a door, damage numbers popping off a hit. A property of an **object**.
 
-World-space UI obeys [[w02:scene-graph|Week 2]] like everything else. It's a child in the object's tree ([[w02:standard-prefab|the Standard Prefab]] has a spot for it; a small canvas under the parent does fine), it rides its parent, and it shrinks with distance.
+World-space UI obeys [[w02:scene-graph|Week 2]] like everything else. It's a child in the object's tree ([[w02:standard-prefab|the Standard Prefab]] has a spot for it, and a small canvas under the parent does fine), it rides its parent, and it shrinks with distance.
 
 ## The test
 

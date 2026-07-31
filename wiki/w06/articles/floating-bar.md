@@ -6,7 +6,7 @@ World-space UI on a training dummy, billboarded.
 
 In the [[w02:standard-prefab|Standard Prefab]], it lives under the parent alongside Visuals. It's presentation attached to the object, and it rides the tree like everything else.
 
-2. Bind its fill to the dummy's health the same polling way. Throw rocks; watch the bar drain over the dummy's head while your own HUD sits still on the glass.
+2. Bind its fill to the dummy's health the same polling way. Throw rocks and watch the bar drain over the dummy's head while your own HUD sits still on the glass.
 
 That contrast, narrated (whose information is on the glass, whose floats in the world), is [[a4-spec|Requirement 5]] in one shot.
 

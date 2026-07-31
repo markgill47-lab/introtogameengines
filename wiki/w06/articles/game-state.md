@@ -10,7 +10,11 @@ Concretely: a `GameState` script holding the numbers and the methods that legall
 
 ## The save-file test
 
-What belongs in state is anything you'd need to reconstruct the *situation*: health, gold, score, inventory contents, quest flags, whether the game is paused or over.
+What belongs in state is anything you'd need to reconstruct the *situation*:
+
+- Resources: health, gold, score.
+- Contents: what's in the inventory, which quests are active.
+- Flow: whether the game is paused, whether it's over.
 
 What doesn't is anything about presentation: the health bar's color, which menu panel is showing, the font size.
 
@@ -26,7 +30,7 @@ Week 13 makes this test literal, because what you serialize *is* your state. Stu
 
 Not philosophically. This week.
 
-- **One fact, many displays.** Health appears as a bar, a number, a red vignette when low, and a game-over screen at zero. Four displays, one fact. If each kept its own copy, they would drift, and "the HUD disagrees with the shop" is a bug players screenshot.
+- **One fact, many displays.** Health appears as a bar, as a number, and as a red vignette when it gets low. Three displays, one fact. If each kept its own copy, they would drift, and "the HUD disagrees with the shop" is a bug players screenshot.
 - **Displays are disposable.** You will restyle your HUD three times this semester. If state lives in its own object, a restyle touches zero game logic. That should sound exactly like swapping Visuals inside a [[w02:standard-prefab|Standard Prefab]], because it is the same discipline one level up: the data is the parent, the UI is the costume.
 
 There's a name for this separation, and a whole architecture built around it. Week 9 pulls that curtain. You're building the evidence now.
