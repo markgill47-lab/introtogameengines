@@ -17,7 +17,8 @@ window.SE266_WIKI = {
     w02: "Week 02 - Scene Graphs, Transforms, and Coordinate Spaces.html",
     w03: "Week 03 - The Game Loop, Time, and Input.html",
     w04: "Week 04 - Design Vocabulary, What Makes Games Games.html",
-    w05: "Week 05 - Physics, Collision, and Authority.html"
+    w05: "Week 05 - Physics, Collision, and Authority.html",
+    w06: "Week 06 - Interface and Game State.html"
   },
 
   sections: [
